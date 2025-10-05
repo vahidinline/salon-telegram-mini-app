@@ -1,0 +1,52 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: 'Vazirmatn';
+  src: url('./utils/fonts/Vazirmatn-Light.ttf') format('truetype');
+}
+
+@layer base {
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    font-family: 'Vazirmatn', -apple-system, BlinkMacSystemFont, 'Segoe UI',
+      'Roboto', 'Helvetica', 'Arial', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  [dir='rtl'] body {
+    font-family: 'Vazirmatn', 'Tahoma', sans-serif;
+  }
+
+  input,
+  button,
+  select,
+  textarea {
+    font-family: 'Vazirmatn';
+  }
+}
+
+@layer utilities {
+  .active\:scale-95:active {
+    transform: scale(0.95);
+  }
+
+  .active\:scale-98:active {
+    transform: scale(0.98);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
