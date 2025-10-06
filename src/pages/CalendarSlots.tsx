@@ -5,12 +5,10 @@ import dayjs from 'dayjs';
 import jalaliday from 'jalaliday';
 import { TimeSlot } from '../types';
 import { useBooking } from '../context/BookingContext';
-import api from '../utils/api';
 import LoadingSpinner from '../components/LoadingSpinner';
 import SlotCard from '../components/SlotCard';
 import TeleButton from '../components/TeleButton';
 import { showTelegramAlert } from '../utils/telegram';
-import { convertToPersianNumber } from '../utils/NumberFarsi';
 
 dayjs.extend(jalaliday);
 
@@ -31,13 +29,12 @@ const CalendarSlots: React.FC = () => {
       navigate('/services');
       return;
     }
-
     generateCalendar();
   }, [bookingState, navigate]);
 
   useEffect(() => {
     if (selectedDate) {
-      fetchSlots();
+      generateSlotsFrontend();
     }
   }, [selectedDate]);
 
@@ -49,25 +46,42 @@ const CalendarSlots: React.FC = () => {
     setCalendar(dates);
   };
 
-  const fetchSlots = async () => {
+  const generateSlotsFrontend = () => {
+    const employee = bookingState.employee;
+    const service = bookingState.service;
+
+    if (!employee || !service) return;
+
     setLoading(true);
     setSelectedSlot(null);
-    try {
-      const dateStr = dayjs(selectedDate).format('YYYY-MM-DD');
-      const response = await api.get('/availability', {
-        params: {
-          employee: bookingState.employee?._id,
-          service: bookingState.service?._id,
-          date: dateStr,
-        },
-      });
-      setSlots(response.data);
-    } catch (error: any) {
-      showTelegramAlert(error.response?.data?.message || t('error'));
+
+    const dayName = dayjs(selectedDate).format('dddd').toLowerCase();
+
+    if (!employee.workDays.includes(dayName)) {
       setSlots([]);
-    } finally {
       setLoading(false);
+      return;
     }
+
+    const [startHour, startMinute] = employee.startTime.split(':').map(Number);
+    const [endHour, endMinute] = employee.endTime.split(':').map(Number);
+
+    let current = dayjs(selectedDate).hour(startHour).minute(startMinute);
+    const end = dayjs(selectedDate).hour(endHour).minute(endMinute);
+    const duration = service.duration;
+
+    const slotList: TimeSlot[] = [];
+    while (
+      current.add(duration, 'minute').isSame(end) ||
+      current.add(duration, 'minute').isBefore(end)
+    ) {
+      const next = current.clone().add(duration, 'minute');
+      slotList.push({ start: current.toDate(), end: next.toDate() });
+      current = next;
+    }
+
+    setSlots(slotList);
+    setLoading(false);
   };
 
   const handleContinue = () => {
@@ -78,17 +92,15 @@ const CalendarSlots: React.FC = () => {
   };
 
   const formatDate = (date: Date) => {
-    if (isJalali) {
-      return dayjs(date).calendar('jalali').format('DD MMMM YYYY');
-    }
-    return dayjs(date).format('DD MMMM YYYY');
+    return isJalali
+      ? dayjs(date).calendar('jalali').format('DD MMMM YYYY')
+      : dayjs(date).format('DD MMMM YYYY');
   };
 
   const formatDayName = (date: Date) => {
-    if (isJalali) {
-      return dayjs(date).calendar('jalali').format('dddd');
-    }
-    return dayjs(date).format('dddd');
+    return isJalali
+      ? dayjs(date).calendar('jalali').format('dddd')
+      : dayjs(date).format('dddd');
   };
 
   return (
@@ -120,29 +132,25 @@ const CalendarSlots: React.FC = () => {
             <div className="flex gap-2 min-w-max">
               {calendar.map((date, index) => {
                 const isSelected = dayjs(date).isSame(selectedDate, 'day');
-                const d = isJalali
-                  ? dayjs(date).calendar('jalali')
-                  : dayjs(date);
-
                 return (
                   <button
                     key={index}
                     onClick={() => setSelectedDate(date)}
                     className={`
-        flex flex-col items-center justify-center w-20 h-24 rounded-lg border-2 transition-all duration-200
-        ${
-          isSelected
-            ? 'border-blue-500 bg-blue-50 text-blue-700'
-            : 'border-gray-200 bg-white hover:border-blue-300'
-        }
-      `}>
+                      flex flex-col items-center justify-center w-20 h-24 rounded-lg border-2 transition-all duration-200
+                      ${
+                        isSelected
+                          ? 'border-blue-500 bg-blue-50 text-blue-700'
+                          : 'border-gray-200 bg-white hover:border-blue-300'
+                      }
+                    `}>
                     <div className="text-xs mb-1">
-                      {d.format('dddd').substring(0, 3)}
+                      {formatDayName(date).substring(0, 3)}
                     </div>
                     <div className="text-2xl font-bold">
-                      {convertToPersianNumber(d.format('D'))}
+                      {dayjs(date).date()}
                     </div>
-                    <div className="text-xs">{d.format('MMM')}</div>
+                    <div className="text-xs">{dayjs(date).format('MMM')}</div>
                   </button>
                 );
               })}

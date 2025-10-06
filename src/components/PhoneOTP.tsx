@@ -37,10 +37,11 @@ const PhoneOTP: React.FC<PhoneOTPProps> = ({ onVerified, telegramUserId }) => {
 
     setLoading(true);
     try {
-      await api.post('/auth/send-otp', {
-        phone: phone.replace(/\s/g, ''),
-        telegramUserId
+      const res = await api.post('/client-auth', {
+        phoneNumber: phone.replace(/\s/g, ''),
+        telegramUserId,
       });
+      console.log('OTP sent response:', res.data);
       setStep('otp');
       setCountdown(60);
       showTelegramAlert(t('otpSent'));
@@ -59,14 +60,15 @@ const PhoneOTP: React.FC<PhoneOTPProps> = ({ onVerified, telegramUserId }) => {
 
     setLoading(true);
     try {
-      const response = await api.post('/auth/verify-otp', {
+      const response = await api.post('/client-auth/verify-otp', {
         phone: phone.replace(/\s/g, ''),
-        code: otp
+        otp: otp,
       });
-      const { token, user } = response.data;
-      localStorage.setItem('token', token);
-      localStorage.setItem('userId', user._id);
-      onVerified(token, user._id);
+      const { status, userData } = response.data;
+      console.log('verif', status, userData);
+      localStorage.setItem('token', status);
+      localStorage.setItem('userId', userData._id);
+      onVerified(status, userData._id);
     } catch (error: any) {
       showTelegramAlert(error.response?.data?.message || t('invalidOTP'));
     } finally {
@@ -85,7 +87,9 @@ const PhoneOTP: React.FC<PhoneOTPProps> = ({ onVerified, telegramUserId }) => {
       {step === 'phone' ? (
         <>
           <div>
-            <label className="block text-sm font-medium mb-2">{t('phone')}</label>
+            <label className="block text-sm font-medium mb-2">
+              {t('phone')}
+            </label>
             <input
               type="tel"
               value={phone}
@@ -98,15 +102,16 @@ const PhoneOTP: React.FC<PhoneOTPProps> = ({ onVerified, telegramUserId }) => {
           <TeleButton
             onClick={handleSendOTP}
             disabled={loading || !phone}
-            className="w-full"
-          >
+            className="w-full">
             {loading ? t('loading') : t('sendOTP')}
           </TeleButton>
         </>
       ) : (
         <>
           <div>
-            <label className="block text-sm font-medium mb-2">{t('otpCode')}</label>
+            <label className="block text-sm font-medium mb-2">
+              {t('otpCode')}
+            </label>
             <input
               type="text"
               value={otp}
@@ -121,8 +126,7 @@ const PhoneOTP: React.FC<PhoneOTPProps> = ({ onVerified, telegramUserId }) => {
           <TeleButton
             onClick={handleVerifyOTP}
             disabled={loading || otp.length < 4}
-            className="w-full"
-          >
+            className="w-full">
             {loading ? t('loading') : t('verifyOTP')}
           </TeleButton>
           <div className="text-center">
@@ -133,8 +137,7 @@ const PhoneOTP: React.FC<PhoneOTPProps> = ({ onVerified, telegramUserId }) => {
             ) : (
               <button
                 onClick={handleResendOTP}
-                className="text-sm text-blue-500 hover:text-blue-600"
-              >
+                className="text-sm text-blue-500 hover:text-blue-600">
                 {t('resendOTP')}
               </button>
             )}

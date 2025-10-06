@@ -34,6 +34,7 @@ const EmployeeSelect: React.FC = () => {
         const response = await api.get(`/salons/${salonId}/employees`, {
           params: { service: bookingState.service?._id },
         });
+        console.log('Fetched employees:', response.data);
         setEmployees(response.data);
       } catch (error: any) {
         showTelegramAlert(error.response?.data?.message || t('error'));
