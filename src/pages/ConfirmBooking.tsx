@@ -27,7 +27,12 @@ const ConfirmBooking: React.FC = () => {
   const isJalali = i18n.language === 'fa';
 
   useEffect(() => {
-    if (!bookingState.service || !bookingState.employee || !bookingState.date || !bookingState.slot) {
+    if (
+      !bookingState.service ||
+      !bookingState.employee ||
+      !bookingState.date ||
+      !bookingState.slot
+    ) {
       navigate('/services');
       return;
     }
@@ -56,7 +61,7 @@ const ConfirmBooking: React.FC = () => {
           rotation: 360,
           duration: 1.5,
           stagger: 0.1,
-          ease: 'power2.out'
+          ease: 'power2.out',
         }
       );
     }
@@ -79,7 +84,7 @@ const ConfirmBooking: React.FC = () => {
         start: bookingState.slot.start,
         end: bookingState.slot.end,
         user: userId,
-        telegramUserId: telegramUser?.id
+        telegramUserId: telegramUser?.id,
       });
 
       await api.post('/notifications', {
@@ -89,8 +94,8 @@ const ConfirmBooking: React.FC = () => {
           service: bookingState.service?.name,
           employee: bookingState.employee?.name,
           date: formatDate(bookingState.date!),
-          time: formatTime(bookingState.slot.start)
-        }
+          time: formatTime(bookingState.slot.start),
+        },
       });
 
       setShowSuccess(true);
@@ -118,7 +123,7 @@ const ConfirmBooking: React.FC = () => {
 
   if (showSuccess) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-blue-50 p-6">
+      <div className="min-h-screen flex items-center justify-center  p-6">
         <div ref={successRef} className="relative text-center">
           <div className="absolute inset-0 pointer-events-none">
             {[...Array(20)].map((_, i) => (
@@ -127,7 +132,7 @@ const ConfirmBooking: React.FC = () => {
                 className="confetti absolute w-2 h-2 bg-gradient-to-r from-yellow-400 to-pink-500 rounded-full"
                 style={{
                   left: `${Math.random() * 100}%`,
-                  top: '50%'
+                  top: '50%',
                 }}
               />
             ))}
@@ -135,7 +140,9 @@ const ConfirmBooking: React.FC = () => {
           <div className="bg-white rounded-full w-24 h-24 flex items-center justify-center mx-auto mb-6 shadow-lg">
             <Check size={48} className="text-green-500" />
           </div>
-          <h2 className="text-3xl font-bold text-gray-800 mb-4">{t('success')}</h2>
+          <h2 className="text-3xl font-bold text-gray-800 mb-4">
+            {t('success')}
+          </h2>
           <p className="text-lg text-gray-600">{t('bookingConfirmed')}</p>
         </div>
       </div>
@@ -146,13 +153,17 @@ const ConfirmBooking: React.FC = () => {
     <div className="min-h-screen bg-gray-50 pb-20">
       <div className="bg-white shadow-sm">
         <div className="max-w-4xl mx-auto p-4">
-          <h1 className="text-2xl font-bold text-gray-800">{t('confirmBooking')}</h1>
+          <h1 className="text-2xl font-bold text-gray-800">
+            {t('confirmBooking')}
+          </h1>
         </div>
       </div>
 
       <div className="max-w-4xl mx-auto p-4 space-y-6">
         <div className="bg-white rounded-lg shadow-sm p-6">
-          <h2 className="text-lg font-semibold text-gray-800 mb-4">{t('summary')}</h2>
+          <h2 className="text-lg font-semibold text-gray-800 mb-4">
+            {t('summary')}
+          </h2>
           <div className="space-y-3">
             <div className="flex justify-between">
               <span className="text-gray-600">{t('service')}:</span>
@@ -164,17 +175,22 @@ const ConfirmBooking: React.FC = () => {
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">{t('date')}:</span>
-              <span className="font-medium">{formatDate(bookingState.date!)}</span>
+              <span className="font-medium">
+                {formatDate(bookingState.date!)}
+              </span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">{t('time')}:</span>
               <span className="font-medium">
-                {formatTime(bookingState.slot!.start)} - {formatTime(bookingState.slot!.end)}
+                {formatTime(bookingState.slot!.start)} -{' '}
+                {formatTime(bookingState.slot!.end)}
               </span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">{t('duration')}:</span>
-              <span className="font-medium">{bookingState.service?.duration} {t('minutes')}</span>
+              <span className="font-medium">
+                {bookingState.service?.duration} {t('minutes')}
+              </span>
             </div>
             <div className="flex justify-between text-lg pt-3 border-t">
               <span className="text-gray-800 font-semibold">{t('price')}:</span>
@@ -187,7 +203,9 @@ const ConfirmBooking: React.FC = () => {
 
         {!isAuthenticated ? (
           <div className="bg-white rounded-lg shadow-sm p-6">
-            <h2 className="text-lg font-semibold text-gray-800 mb-4">{t('phone')}</h2>
+            <h2 className="text-lg font-semibold text-gray-800 mb-4">
+              {t('phone')}
+            </h2>
             <PhoneOTP
               onVerified={handleVerified}
               telegramUserId={telegramUser?.id}
@@ -197,8 +215,7 @@ const ConfirmBooking: React.FC = () => {
           <TeleButton
             onClick={handleConfirm}
             disabled={loading}
-            className="w-full py-4"
-          >
+            className="w-full py-4">
             {loading ? t('loading') : t('confirm')}
           </TeleButton>
         )}

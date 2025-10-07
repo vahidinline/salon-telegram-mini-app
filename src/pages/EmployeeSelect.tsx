@@ -9,6 +9,7 @@ import LoadingSpinner from '../components/LoadingSpinner';
 import TeleButton from '../components/TeleButton';
 import { showTelegramAlert } from '../utils/telegram';
 import { useStaggerAnimation } from '../hooks/useAnimations';
+import axios from 'axios';
 
 const EmployeeSelect: React.FC = () => {
   const { t } = useTranslation();
@@ -30,6 +31,7 @@ const EmployeeSelect: React.FC = () => {
     }
 
     const fetchEmployees = async () => {
+      console.log('Fetching employees for salon:', salonId);
       try {
         const response = await api.get(`/salons/${salonId}/employees`, {
           params: { service: bookingState.service?._id },
@@ -56,7 +58,7 @@ const EmployeeSelect: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-20">
+    <div className="min-h-screen  pb-20">
       <div className="bg-white shadow-sm sticky top-0 z-10">
         <div className="max-w-4xl mx-auto p-4">
           <h1 className="text-2xl font-bold text-gray-800 mb-2">
@@ -81,9 +83,9 @@ const EmployeeSelect: React.FC = () => {
               className="employee-card bg-white rounded-lg shadow-sm p-4">
               <div className="flex items-start gap-4 mb-4">
                 <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-400 to-cyan-500 flex items-center justify-center text-white">
-                  {employee.avatar ? (
+                  {employee.photo ? (
                     <img
-                      src={employee.avatar}
+                      src={employee.photo}
                       alt={employee.name}
                       className="w-full h-full rounded-full object-cover"
                     />
@@ -115,7 +117,7 @@ const EmployeeSelect: React.FC = () => {
               <TeleButton
                 onClick={() => handleSelectEmployee(employee)}
                 className="w-full">
-                {t('selectEmployee')}
+                {t('selectEmployee')} {employee.name}
               </TeleButton>
             </div>
           ))

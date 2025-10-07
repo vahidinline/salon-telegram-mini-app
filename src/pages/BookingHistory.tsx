@@ -35,7 +35,7 @@ const BookingHistory: React.FC = () => {
 
     try {
       const response = await api.get(`/bookings`, {
-        params: { user: userId }
+        params: { user: userId },
       });
       setBookings(response.data);
     } catch (error: any) {
@@ -90,10 +90,12 @@ const BookingHistory: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-20">
+    <div className="min-h-screen  pb-20">
       <div className="bg-white shadow-sm sticky top-0 z-10">
         <div className="max-w-4xl mx-auto p-4">
-          <h1 className="text-2xl font-bold text-gray-800">{t('bookingHistory')}</h1>
+          <h1 className="text-2xl font-bold text-gray-800">
+            {t('bookingHistory')}
+          </h1>
         </div>
       </div>
 
@@ -110,18 +112,21 @@ const BookingHistory: React.FC = () => {
           bookings.map((booking) => {
             const service = booking.service as Service;
             const employee = booking.employee as Employee;
-            const canCancel = booking.status === 'pending' || booking.status === 'confirmed';
+            const canCancel =
+              booking.status === 'pending' || booking.status === 'confirmed';
 
             return (
               <div
                 key={booking._id}
-                className="booking-card bg-white rounded-lg shadow-sm p-4"
-              >
+                className="booking-card bg-white rounded-lg shadow-sm p-4">
                 <div className="flex items-start justify-between mb-3">
                   <h3 className="text-lg font-semibold text-gray-800">
                     {typeof service === 'object' ? service.name : 'Service'}
                   </h3>
-                  <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(booking.status)}`}>
+                  <span
+                    className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(
+                      booking.status
+                    )}`}>
                     {t(booking.status || 'pending')}
                   </span>
                 </div>
@@ -129,7 +134,11 @@ const BookingHistory: React.FC = () => {
                 <div className="space-y-2 text-sm text-gray-600 mb-4">
                   <div className="flex items-center gap-2">
                     <User size={16} />
-                    <span>{typeof employee === 'object' ? employee.name : 'Employee'}</span>
+                    <span>
+                      {typeof employee === 'object'
+                        ? employee.name
+                        : 'Employee'}
+                    </span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Calendar size={16} />
@@ -137,7 +146,9 @@ const BookingHistory: React.FC = () => {
                   </div>
                   <div className="flex items-center gap-2">
                     <Clock size={16} />
-                    <span>{formatTime(booking.start)} - {formatTime(booking.end)}</span>
+                    <span>
+                      {formatTime(booking.start)} - {formatTime(booking.end)}
+                    </span>
                   </div>
                 </div>
 
@@ -145,8 +156,7 @@ const BookingHistory: React.FC = () => {
                   <TeleButton
                     onClick={() => handleCancelBooking(booking)}
                     variant="danger"
-                    className="w-full flex items-center justify-center gap-2"
-                  >
+                    className="w-full flex items-center justify-center gap-2">
                     <XCircle size={18} />
                     {t('cancelBooking')}
                   </TeleButton>

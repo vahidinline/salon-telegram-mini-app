@@ -9,7 +9,7 @@ const resources = {
       bookingHistory: 'تاریخچه رزرو',
       services: 'خدمات',
       selectService: 'انتخاب سرویس',
-      selectEmployee: 'انتخاب ناخنکار',
+      selectEmployee: 'انتخاب ',
       selectDateTime: 'انتخاب تاریخ و زمان',
       confirmBooking: 'تایید رزرو',
       bookings: 'رزروها',
@@ -59,6 +59,7 @@ const resources = {
       confirmCancel: 'آیا از لغو این رزرو اطمینان دارید؟',
       hello: 'سلام، {{name}}',
       chooseLang: 'انتخاب زبان',
+      bookingManagement: 'مدیریت رزروها',
     },
   },
   en: {
@@ -118,6 +119,7 @@ const resources = {
       confirmCancel: 'Are you sure you want to cancel this booking?',
       hello: 'Hello, {{name}}',
       chooseLang: 'Choose Language',
+      bookingManagement: 'Booking Management',
     },
   },
 };

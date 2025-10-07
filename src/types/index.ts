@@ -14,7 +14,7 @@ export interface Employee {
   workDays: string[];
   startTime: string;
   endTime: string;
-  avatar?: string;
+  photo?: string;
 }
 
 export interface TimeSlot {

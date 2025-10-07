@@ -1,7 +1,8 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://localhost:5001',
+  baseURL:
+    'https://lively-meadow-8f10bc69131e43399fb94ec2bdf12e81.azurewebsites.net',
   timeout: 15000,
 });
 

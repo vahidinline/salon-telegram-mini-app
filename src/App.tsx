@@ -15,6 +15,7 @@ import CalendarSlots from './pages/CalendarSlots';
 import ConfirmBooking from './pages/ConfirmBooking';
 import BookingHistory from './pages/BookingHistory';
 import { initTelegramWebApp } from './utils/telegram';
+import Background from './assets/img/wallpaper.jpeg';
 
 function App() {
   const { i18n } = useTranslation();
@@ -31,7 +32,11 @@ function App() {
   return (
     <BookingProvider>
       <Router>
-        <div className="min-h-screen bg-gray-50">
+        <div
+          style={{
+            backgroundImage: `url(${Background})`,
+          }}
+          className="min-h-screen bg-gray-50 bg-gradient-to-b from-white to-blue-50 relative">
           <div className="fixed top-4 end-4 z-50">
             <LanguageSwitcher />
           </div>
