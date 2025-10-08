@@ -19,7 +19,8 @@ const Welcome: React.FC = () => {
 
   const telegramUser = getTelegramUser();
   const userName = telegramUser?.first_name || 'Guest';
-  console.log('username', userName);
+  const photoUrl = telegramUser?.photo_url || '';
+
   useEffect(() => {
     if (!containerRef.current || prefersReducedMotion) return;
 
@@ -104,13 +105,13 @@ const Welcome: React.FC = () => {
               {t('reserve')}
             </TeleButton>
 
-            <TeleButton
+            {/* <TeleButton
               onClick={() => navigate('/')}
               variant="secondary"
               className="action-button w-full py-6 text-lg flex items-center justify-center gap-3">
               <FolderKanban />
               {t('bookingManagement')} ( بزودی)
-            </TeleButton>
+            </TeleButton> */}
             <TeleButton
               onClick={() => navigate('/bookings')}
               variant="secondary"

@@ -8,7 +8,8 @@ import { useBooking } from '../context/BookingContext';
 import LoadingSpinner from '../components/LoadingSpinner';
 import SlotCard from '../components/SlotCard';
 import TeleButton from '../components/TeleButton';
-import { showTelegramAlert } from '../utils/telegram';
+import 'dayjs/locale/fa';
+import { convertToPersianNumber } from '../utils/NumberFarsi';
 
 dayjs.extend(jalaliday);
 
@@ -93,13 +94,13 @@ const CalendarSlots: React.FC = () => {
 
   const formatDate = (date: Date) => {
     return isJalali
-      ? dayjs(date).calendar('jalali').format('DD MMMM YYYY')
-      : dayjs(date).format('DD MMMM YYYY');
+      ? dayjs(date).calendar('jalali').locale('fa').format('DDDD MMMM YYYY')
+      : dayjs(date).format('DDDD MMMM YYYY');
   };
 
   const formatDayName = (date: Date) => {
     return isJalali
-      ? dayjs(date).calendar('jalali').format('dddd')
+      ? dayjs(date).calendar('jalali').locale('fa').format('dddd')
       : dayjs(date).format('dddd');
   };
 
@@ -125,7 +126,7 @@ const CalendarSlots: React.FC = () => {
 
       <div className="max-w-4xl mx-auto p-4 space-y-6">
         <div>
-          <h2 className="text-lg font-semibold text-gray-800 mb-3">
+          <h2 className="text-lg font-semibold text-white mb-3">
             {t('selectDate')}
           </h2>
           <div className="overflow-x-auto pb-2">
@@ -145,12 +146,14 @@ const CalendarSlots: React.FC = () => {
                       }
                     `}>
                     <div className="text-xs mb-1">
-                      {formatDayName(date).substring(0, 3)}
+                      {formatDayName(date).substring(0, 9)}
                     </div>
                     <div className="text-2xl font-bold">
-                      {dayjs(date).date()}
+                      {convertToPersianNumber(
+                        dayjs(date).calendar('jalali').locale('fa').format('D')
+                      )}
                     </div>
-                    <div className="text-xs">{dayjs(date).format('MMM')}</div>
+                    {dayjs(date).calendar('jalali').locale('fa').format('MMMM')}
                   </button>
                 );
               })}
@@ -159,13 +162,13 @@ const CalendarSlots: React.FC = () => {
         </div>
 
         <div>
-          <h2 className="text-lg font-semibold text-gray-800 mb-3">
-            {t('availableSlots')} - {formatDate(selectedDate)}
+          <h2 className="text-lg font-semibold text-white mb-3">
+            {t('availableSlots')}
           </h2>
           {loading ? (
             <LoadingSpinner />
           ) : slots.length === 0 ? (
-            <div className="text-center py-12 text-gray-500">
+            <div className="text-center py-12 text-white">
               {t('noSlotsAvailable')}
             </div>
           ) : (

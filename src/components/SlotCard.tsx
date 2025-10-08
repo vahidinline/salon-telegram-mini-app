@@ -24,7 +24,7 @@ const SlotCard: React.FC<SlotCardProps> = ({
       onClick={onSelect}
       disabled={disabled}
       className={`
-        px-4 py-3 rounded-lg border-2 transition-all duration-200
+        px-4 py-3 rounded-lg border-2 transition-all duration-200 flex flex-row font-bold
         ${
           selected
             ? 'border-blue-500 bg-blue-50 text-blue-700'
@@ -36,10 +36,9 @@ const SlotCard: React.FC<SlotCardProps> = ({
             : 'cursor-pointer active:scale-95'
         }
       `}>
-      <div className="font-medium">{convertToPersianNumber(startTime)}</div>
-      <div className="text-sm text-gray-500">
-        {convertToPersianNumber(endTime)}
-      </div>
+      <div className="">{convertToPersianNumber(startTime)}</div>
+      <div className=" text-gray-500 px-1">تا</div>
+      <div className="">{convertToPersianNumber(endTime)}</div>
     </button>
   );
 };

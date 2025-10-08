@@ -15,7 +15,8 @@ import CalendarSlots from './pages/CalendarSlots';
 import ConfirmBooking from './pages/ConfirmBooking';
 import BookingHistory from './pages/BookingHistory';
 import { initTelegramWebApp } from './utils/telegram';
-import Background from './assets/img/wallpaper.jpeg';
+import Background from './assets/img/wallpaper.jpg';
+import BackButton from './components/GoBack';
 
 function App() {
   const { i18n } = useTranslation();
@@ -36,9 +37,10 @@ function App() {
           style={{
             backgroundImage: `url(${Background})`,
           }}
-          className="min-h-screen bg-gray-50 bg-gradient-to-b from-white to-blue-50 relative">
-          <div className="fixed top-4 end-4 z-50">
-            <LanguageSwitcher />
+          className="min-h-screen">
+          <div className="fixed flex flex-row justify-between top-4 end-4 z-50">
+            {/* <LanguageSwitcher /> */}
+            <BackButton />
           </div>
           <Routes>
             <Route path="/" element={<Welcome />} />

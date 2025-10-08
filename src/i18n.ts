@@ -56,6 +56,7 @@ const resources = {
       workHours: 'ساعات کاری',
       noBookings: 'رزروی وجود ندارد',
       cancelBooking: 'لغو رزرو',
+      manageBooking: 'مدیریت رزرو',
       confirmCancel: 'آیا از لغو این رزرو اطمینان دارید؟',
       hello: 'سلام، {{name}}',
       chooseLang: 'انتخاب زبان',
@@ -120,6 +121,7 @@ const resources = {
       hello: 'Hello, {{name}}',
       chooseLang: 'Choose Language',
       bookingManagement: 'Booking Management',
+      manageBooking: 'Manage Booking',
     },
   },
 };

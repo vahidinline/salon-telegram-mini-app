@@ -18,7 +18,7 @@ const BookingHistory: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const userId = localStorage.getItem('userId');
+  const userId = '1234567';
   const isJalali = i18n.language === 'fa';
 
   useStaggerAnimation('.booking-card', containerRef);
@@ -34,9 +34,12 @@ const BookingHistory: React.FC = () => {
     }
 
     try {
-      const response = await api.get(`/bookings`, {
-        params: { user: userId },
-      });
+      const response = await api.get(
+        `/salons/651a6b2f8b7a5a1d223e4c90/bookings`,
+        {
+          params: { user: userId },
+        }
+      );
       setBookings(response.data);
     } catch (error: any) {
       showTelegramAlert(error.response?.data?.message || t('error'));
@@ -49,7 +52,7 @@ const BookingHistory: React.FC = () => {
     showTelegramConfirm(t('confirmCancel'), async (confirmed) => {
       if (confirmed && booking._id) {
         try {
-          await api.delete(`/bookings/${booking._id}`);
+          await api.delete(`/salons/salonId/bookings/`);
           showTelegramAlert(t('bookingCancelled'));
           fetchBookings();
         } catch (error: any) {
@@ -121,7 +124,7 @@ const BookingHistory: React.FC = () => {
                 className="booking-card bg-white rounded-lg shadow-sm p-4">
                 <div className="flex items-start justify-between mb-3">
                   <h3 className="text-lg font-semibold text-gray-800">
-                    {typeof service === 'object' ? service.name : 'Service'}
+                    {typeof service === 'object' ? service.name : 'ترمیم ناخن'}
                   </h3>
                   <span
                     className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(
@@ -135,9 +138,7 @@ const BookingHistory: React.FC = () => {
                   <div className="flex items-center gap-2">
                     <User size={16} />
                     <span>
-                      {typeof employee === 'object'
-                        ? employee.name
-                        : 'Employee'}
+                      {typeof employee === 'object' ? employee.name : 'مریم'}
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
@@ -152,15 +153,23 @@ const BookingHistory: React.FC = () => {
                   </div>
                 </div>
 
-                {canCancel && (
+                <div className="flex gap-3">
                   <TeleButton
                     onClick={() => handleCancelBooking(booking)}
-                    variant="danger"
+                    variant="alert"
                     className="w-full flex items-center justify-center gap-2">
                     <XCircle size={18} />
                     {t('cancelBooking')}
                   </TeleButton>
-                )}
+
+                  <TeleButton
+                    onClick={() => handleCancelBooking(booking)}
+                    variant="primary"
+                    className="w-full flex items-center justify-center gap-2">
+                    <XCircle size={18} />
+                    {t('manageBooking')}
+                  </TeleButton>
+                </div>
               </div>
             );
           })
