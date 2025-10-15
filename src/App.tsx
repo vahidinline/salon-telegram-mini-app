@@ -7,7 +7,6 @@ import {
 } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { BookingProvider } from './context/BookingContext';
-import LanguageSwitcher from './components/LanguageSwitcher';
 import Welcome from './pages/Welcome';
 import ServiceList from './pages/ServiceList';
 import EmployeeSelect from './pages/EmployeeSelect';
@@ -15,7 +14,7 @@ import CalendarSlots from './pages/CalendarSlots';
 import ConfirmBooking from './pages/ConfirmBooking';
 import BookingHistory from './pages/BookingHistory';
 import { initTelegramWebApp } from './utils/telegram';
-import Background from './assets/img/wallpaper.jpg';
+import PaymentInfo from './pages/PaymentInfo';
 import BackButton from './components/GoBack';
 
 function App() {
@@ -34,10 +33,10 @@ function App() {
     <BookingProvider>
       <Router>
         <div
-          style={{
-            backgroundImage: `url(${Background})`,
-          }}
-          className="min-h-screen">
+          // style={{
+          //   backgroundImage: `url(${Background})`,
+          // }}
+          className="min-h-screen bg-cover bg-center">
           <div className="fixed flex flex-row justify-between top-4 end-4 z-50">
             {/* <LanguageSwitcher /> */}
             <BackButton />
@@ -48,6 +47,7 @@ function App() {
             <Route path="/employees" element={<EmployeeSelect />} />
             <Route path="/calendar" element={<CalendarSlots />} />
             <Route path="/confirm" element={<ConfirmBooking />} />
+            <Route path="/paymentinfo" element={<PaymentInfo />} />
             <Route path="/bookings" element={<BookingHistory />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>

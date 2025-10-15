@@ -175,10 +175,8 @@ const FileUpload: React.FC<FileUploadProps> = ({
           onClick={() => fileInputRef.current?.click()}
           className="flex-1 flex flex-col items-center justify-center gap-2 p-6 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-400 hover:bg-blue-50 transition-all duration-200 active:scale-98">
           <Upload size={32} className="text-gray-400" />
-          <span className="text-sm font-medium text-gray-600">
-            {t('chooseFile')}
-          </span>
-          <span className="text-xs text-gray-500">{t('uploadHint')}</span>
+          <span className="text-sm font-medium text-gray-600">انتخاب فایل</span>
+          <span className="text-xs text-gray-500">آپلود رسید</span>
         </button>
 
         <button
@@ -186,10 +184,10 @@ const FileUpload: React.FC<FileUploadProps> = ({
           onClick={() => cameraInputRef.current?.click()}
           className="flex-1 flex flex-col items-center justify-center gap-2 p-6 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-400 hover:bg-blue-50 transition-all duration-200 active:scale-98">
           <Camera size={32} className="text-gray-400" />
-          <span className="text-sm font-medium text-gray-600">
-            {t('takePhoto')}
+          <span className="text-sm font-medium text-gray-600">دوربین</span>
+          <span className="text-xs text-gray-500">
+            از رسید پرداخت عکس بگیرید
           </span>
-          <span className="text-xs text-gray-500">{t('cameraHint')}</span>
         </button>
       </div>
 
@@ -297,7 +295,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
       )}
 
       <p className="text-xs text-gray-500">
-        {t('acceptedFormats')}: JPG, PNG, PDF ({t('maxSize')}: {maxSizeMB}MB)
+        فرمت های مجاز : JPG, PNG, PDF حداکثر حجم : {maxSizeMB}MB)
       </p>
     </div>
   );

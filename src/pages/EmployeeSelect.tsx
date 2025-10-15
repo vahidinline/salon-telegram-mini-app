@@ -9,7 +9,6 @@ import LoadingSpinner from '../components/LoadingSpinner';
 import TeleButton from '../components/TeleButton';
 import { showTelegramAlert } from '../utils/telegram';
 import { useStaggerAnimation } from '../hooks/useAnimations';
-import axios from 'axios';
 
 const EmployeeSelect: React.FC = () => {
   const { t } = useTranslation();
@@ -23,8 +22,18 @@ const EmployeeSelect: React.FC = () => {
 
   useStaggerAnimation('.employee-card', containerRef);
 
+  // Persian day translation map
+  const dayMap: Record<string, string> = {
+    saturday: 'شنبه',
+    sunday: 'یکشنبه',
+    monday: 'دوشنبه',
+    tuesday: 'سه‌شنبه',
+    wednesday: 'چهارشنبه',
+    thursday: 'پنجشنبه',
+    friday: 'جمعه',
+  };
+
   useEffect(() => {
-    console.log('Selected service:', bookingState.service);
     if (!bookingState.service) {
       navigate('/services');
       return;
@@ -33,12 +42,16 @@ const EmployeeSelect: React.FC = () => {
     const fetchEmployees = async () => {
       console.log('Fetching employees for salon:', salonId);
       try {
-        const response = await api.get(`/salons/${salonId}/employees`, {
-          params: { service: bookingState.service?._id },
-        });
+        const response = await api.get(
+          `/salons/${salonId}/employees/${bookingState.service?._id}`,
+          {
+            params: { service: bookingState.service?._id },
+          }
+        );
         console.log('Fetched employees:', response.data);
         setEmployees(response.data);
       } catch (error: any) {
+        console.error(error);
         showTelegramAlert(error.response?.data?.message || t('error'));
       } finally {
         setLoading(false);
@@ -58,7 +71,7 @@ const EmployeeSelect: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen  pb-20">
+    <div className="min-h-screen pb-20">
       <div className="bg-white shadow-sm sticky top-0 z-10">
         <div className="max-w-4xl mx-auto p-4">
           <h1 className="text-2xl font-bold text-gray-800 mb-2">
@@ -83,9 +96,9 @@ const EmployeeSelect: React.FC = () => {
               className="employee-card bg-white rounded-lg shadow-sm p-4">
               <div className="flex items-start gap-4 mb-4">
                 <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-400 to-cyan-500 flex items-center justify-center text-white">
-                  {employee.photo ? (
+                  {employee.avatar ? (
                     <img
-                      src={employee.photo}
+                      src={employee.avatar}
                       alt={employee.name}
                       className="w-full h-full rounded-full object-cover"
                     />
@@ -93,27 +106,36 @@ const EmployeeSelect: React.FC = () => {
                     <User size={32} />
                   )}
                 </div>
+
                 <div className="flex-1">
                   <h3 className="text-lg font-semibold text-gray-800">
                     {employee.name}
                   </h3>
+
+                  {/* ✅ Display work schedule dynamically */}
                   <div className="mt-2 space-y-1 text-sm text-gray-600">
-                    <div className="flex items-center gap-2">
-                      <CalendarIcon size={16} />
-                      <span>
-                        {t('workDays')}: {employee.workDays.join(', ')}
+                    {employee.workSchedule &&
+                    employee.workSchedule.length > 0 ? (
+                      employee.workSchedule.map((dayItem, idx) => (
+                        <div key={idx} className="flex items-center gap-2">
+                          <CalendarIcon size={16} />
+                          <span>{dayMap[dayItem.day] || dayItem.day}</span>
+                          {/* <Clock size={16} className="ml-1" />
+                          <span>
+                            {dayItem.startTime || '--:--'} -{' '}
+                            {dayItem.endTime || '--:--'}
+                          </span> */}
+                        </div>
+                      ))
+                    ) : (
+                      <span className="text-gray-400">
+                        {t('noScheduleAvailable')}
                       </span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Clock size={16} />
-                      <span>
-                        {t('workHours')}: {employee.startTime} -{' '}
-                        {employee.endTime}
-                      </span>
-                    </div>
+                    )}
                   </div>
                 </div>
               </div>
+
               <TeleButton
                 onClick={() => handleSelectEmployee(employee)}
                 className="w-full">

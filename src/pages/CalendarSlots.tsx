@@ -58,23 +58,32 @@ const CalendarSlots: React.FC = () => {
 
     const dayName = dayjs(selectedDate).format('dddd').toLowerCase();
 
-    if (!employee.workDays.includes(dayName)) {
+    // ✅ Find today's schedule from workSchedule
+    const schedule = employee.workSchedule?.find(
+      (d: any) => d.day.toLowerCase() === dayName
+    );
+
+    if (!schedule) {
       setSlots([]);
       setLoading(false);
       return;
     }
 
-    const [startHour, startMinute] = employee.startTime.split(':').map(Number);
-    const [endHour, endMinute] = employee.endTime.split(':').map(Number);
+    const [startHour, startMinute] = schedule.startTime
+      ? schedule.startTime.split(':').map(Number)
+      : [9, 0];
+    const [endHour, endMinute] = schedule.endTime
+      ? schedule.endTime.split(':').map(Number)
+      : [17, 0];
 
     let current = dayjs(selectedDate).hour(startHour).minute(startMinute);
     const end = dayjs(selectedDate).hour(endHour).minute(endMinute);
-    const duration = service.duration;
+    const duration = service.duration || 30;
 
     const slotList: TimeSlot[] = [];
     while (
-      current.add(duration, 'minute').isSame(end) ||
-      current.add(duration, 'minute').isBefore(end)
+      current.add(duration, 'minute').isBefore(end) ||
+      current.add(duration, 'minute').isSame(end)
     ) {
       const next = current.clone().add(duration, 'minute');
       slotList.push({ start: current.toDate(), end: next.toDate() });

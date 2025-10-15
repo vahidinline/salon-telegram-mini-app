@@ -11,7 +11,7 @@ import api from '../utils/api';
 import { getTelegramUser, showTelegramAlert } from '../utils/telegram';
 import gsap from 'gsap';
 import { convertToPersianNumber } from '../utils/NumberFarsi';
-import FileUpload from '../components/FileUpload';
+
 dayjs.extend(jalaliday);
 
 const ConfirmBooking: React.FC = () => {
@@ -22,16 +22,15 @@ const ConfirmBooking: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const successRef = useRef<HTMLDivElement>(null);
-  const [uploadedFiles, setUploadedFiles] = useState<string[]>([]);
+
   const telegramUser = getTelegramUser();
   const salonId = import.meta.env.VITE_SALON_ID;
   const isJalali = i18n.language === 'fa';
-
   const userName = telegramUser?.first_name || 'Guest';
   const photoUrl = telegramUser?.photo_url || '';
-  const token = localStorage.getItem('token');
   const telegramUserId = telegramUser?.id;
 
+  // ✅ Redirect if required data is missing
   useEffect(() => {
     if (
       !bookingState.service ||
@@ -42,11 +41,8 @@ const ConfirmBooking: React.FC = () => {
       navigate('/services');
       return;
     }
-
     const token = localStorage.getItem('token');
-    if (token) {
-      setIsAuthenticated(true);
-    }
+    if (token) setIsAuthenticated(true);
   }, [bookingState, navigate]);
 
   useEffect(() => {
@@ -56,7 +52,6 @@ const ConfirmBooking: React.FC = () => {
         { scale: 0, opacity: 0 },
         { scale: 1, opacity: 1, duration: 0.5, ease: 'back.out(1.7)' }
       );
-
       const confetti = successRef.current.querySelectorAll('.confetti');
       gsap.fromTo(
         confetti,
@@ -73,43 +68,37 @@ const ConfirmBooking: React.FC = () => {
     }
   }, [showSuccess]);
 
-  const handleVerified = () => {
-    setIsAuthenticated(true);
-  };
+  const handleVerified = () => setIsAuthenticated(true);
 
   const handleConfirm = async () => {
-    if (!bookingState.slot) return;
+    if (!bookingState.slot || !bookingState.service || !bookingState.employee)
+      return;
 
     setLoading(true);
     try {
-      const userId = localStorage.getItem('userId');
-      await api.post('/salons/651a6b2f8b7a5a1d223e4c90/bookings', {
+      await api.post(`/salons/${salonId}/bookings`, {
         salon: salonId,
-        employee: bookingState.employee?._id,
-        service: bookingState.service?._id,
+        employee: bookingState.employee._id,
+        service: bookingState.service._id,
         start: bookingState.slot.start,
         end: bookingState.slot.end,
         user: telegramUserId,
         clientName: userName,
         clientPhone: localStorage.getItem('phoneNumber') || '',
       });
-
-      // await api.post('/notifications', {
-      //   type: 'booking_created',
-      //   userId,
-      //   bookingDetails: {
-      //     service: bookingState.service?.name,
-      //     employee: bookingState.employee?.name,
-      //     date: formatDate(bookingState.date!),
-      //     time: formatTime(bookingState.slot.start),
-      //   },
-      // });
+      navigate('/paymentinfo', {
+        state: {
+          service: bookingState.service,
+          employee: bookingState.employee,
+          date: bookingState.date,
+          slot: bookingState.slot,
+        },
+      });
 
       setShowSuccess(true);
-      navigate('/bookings');
       setTimeout(() => {
         resetBooking();
-        navigate('/bookings');
+        navigate('/paymentinfo');
       }, 3000);
     } catch (error: any) {
       showTelegramAlert(error.response?.data?.message || t('error'));
@@ -118,33 +107,38 @@ const ConfirmBooking: React.FC = () => {
     }
   };
 
-  const formatDate = (date: Date) => {
-    if (isJalali) {
-      return dayjs(date).calendar('jalali').format('DD MMMM YYYY');
-    }
-    return dayjs(date).format('DD MMMM YYYY');
-  };
+  const formatDate = (date: Date) =>
+    isJalali
+      ? dayjs(date).calendar('jalali').format('DD MMMM YYYY')
+      : dayjs(date).format('DD MMMM YYYY');
 
-  const formatTime = (datetime: string) => {
-    return dayjs(datetime).format('HH:mm');
-  };
+  const formatTime = (datetime?: string) =>
+    datetime ? dayjs(datetime).format('HH:mm') : '';
 
   const formatJalaliDate = (date: string | Date) => {
     const jalaliDate = dayjs(date).calendar('jalali');
-    const day = convertToPersianNumber(jalaliDate.date());
-    const month = jalaliDate.format('MMMM'); // full Persian month name
-    const year = convertToPersianNumber(jalaliDate.year());
-
-    return `${day} ${month} ${year}`;
+    return `${convertToPersianNumber(jalaliDate.date())} ${jalaliDate.format(
+      'MMMM'
+    )} ${convertToPersianNumber(jalaliDate.year())}`;
   };
 
-  const handleFileUpload = (fileUrl: string) => {
-    setUploadedFiles((prev) => [...prev, fileUrl]);
-  };
+  // ✅ Guard clause to prevent null render crash
+  if (
+    !bookingState.slot ||
+    !bookingState.date ||
+    !bookingState.service ||
+    !bookingState.employee
+  ) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-gray-500">
+        {t('loading')}...
+      </div>
+    );
+  }
 
   if (showSuccess) {
     return (
-      <div className="min-h-screen flex items-center justify-center  p-6">
+      <div className="min-h-screen flex items-center justify-center p-6">
         <div ref={successRef} className="relative text-center">
           <div className="absolute inset-0 pointer-events-none">
             {[...Array(20)].map((_, i) => (
@@ -171,7 +165,7 @@ const ConfirmBooking: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen  pb-20">
+    <div className="min-h-screen pb-20">
       <div className="bg-white shadow-sm">
         <div className="max-w-4xl mx-auto p-4">
           <h1 className="text-2xl font-bold text-gray-800">
@@ -182,79 +176,73 @@ const ConfirmBooking: React.FC = () => {
 
       <div className="max-w-4xl mx-auto p-4 space-y-6">
         <div className="bg-white rounded-lg shadow-sm p-6">
-          <div className="flex justify-between gap-3 mb-4 ">
-            <h2 className="text-lg font-semibold text-gray-800 mb-4">
+          <div className="flex justify-between gap-3 mb-4">
+            <h2 className="text-lg font-semibold text-gray-800">
               {t('summary')}
             </h2>
           </div>
 
-          <div className="flex item-center gap-3 mb-4 shadow-sm p-4 border rounded-lg">
-            <span className="flex flex-col items-center justify-center">
-              {' '}
+          <div className="flex items-center gap-3 mb-4 shadow-sm p-4 border rounded-lg">
+            <div className="flex flex-col items-center justify-center">
               <img
-                src={bookingState.employee?.photo}
-                alt={bookingState.employee?.name}
-                className="w-12 h-12 rounded-full inline-block object-cover"
+                src={bookingState.employee.avatar}
+                alt={bookingState.employee.name}
+                className="w-12 h-12 rounded-full object-cover"
               />
-              <span className="font-medium">
-                {bookingState.employee?.name}{' '}
-              </span>
-              <span></span>
-            </span>
+              <span className="font-medium">{bookingState.employee.name}</span>
+            </div>
 
-            <span className="m-auto">
-              {' '}
-              <ArrowLeftRight size={30} />
-            </span>
+            <ArrowLeftRight size={30} className="mx-auto" />
 
-            <span className="flex flex-col items-center justify-center">
+            <div className="flex flex-col items-center justify-center">
               <img
                 src={photoUrl || ''}
                 alt={userName}
-                className="w-12 h-12 rounded-full inline-block object-cover"
+                className="w-12 h-12 rounded-full object-cover"
               />
-              <span className="font-medium">{userName} </span>
-            </span>
+              <span className="font-medium">{userName}</span>
+            </div>
           </div>
 
           <div className="space-y-3">
             <div className="flex justify-between">
               <span className="text-gray-600">{t('service')}:</span>
-              <span className="font-medium">{bookingState.service?.name}</span>
+              <span className="font-medium">{bookingState.service.name}</span>
             </div>
+
             <div className="flex justify-between">
               <span className="text-gray-600">{t('employee')}:</span>
-
-              <span className="font-medium">
-                <span className="font-medium">
-                  {bookingState.employee?.name}{' '}
-                </span>
-              </span>
+              <span className="font-medium">{bookingState.employee.name}</span>
             </div>
+
             <div className="flex justify-between">
               <span className="text-gray-600">{t('date')}:</span>
               <span className="font-medium">
-                {formatJalaliDate(bookingState.date!)}
+                {formatJalaliDate(bookingState.date)}
               </span>
             </div>
+
             <div className="flex justify-between">
               <span className="text-gray-600">{t('time')}:</span>
               <span className="font-medium">
-                {convertToPersianNumber(formatTime(bookingState.slot!.start))} -{' '}
-                {convertToPersianNumber(formatTime(bookingState.slot!.end))}
+                {convertToPersianNumber(formatTime(bookingState.slot.start))} -{' '}
+                {convertToPersianNumber(formatTime(bookingState.slot.end))}
               </span>
             </div>
+
             <div className="flex justify-between">
               <span className="text-gray-600">{t('duration')}:</span>
               <span className="font-medium">
-                {convertToPersianNumber(bookingState.service?.duration)}{' '}
+                {convertToPersianNumber(bookingState.service.duration)}{' '}
                 {t('minutes')}
               </span>
             </div>
+
             <div className="flex justify-between text-lg pt-3 border-t">
               <span className="text-gray-800 font-semibold">{t('price')}:</span>
               <span className="text-blue-600 font-bold">
-                {convertToPersianNumber(bookingState.service?.price)}{' '}
+                {/* {convertToPersianNumber(bookingState.service.price)}{' '} */}
+                {bookingState.service.price}
                 {t('toman')}
               </span>
             </div>
@@ -280,16 +268,6 @@ const ConfirmBooking: React.FC = () => {
           </TeleButton>
         )}
       </div>
-      {/* <FileUpload
-        onUploadComplete={handleFileUpload}
-        maxSizeMB={10}
-        acceptedTypes={[
-          'image/jpeg',
-          'image/png',
-          'image/jpg',
-          'application/pdf',
-        ]}
-      /> */}
     </div>
   );
 };

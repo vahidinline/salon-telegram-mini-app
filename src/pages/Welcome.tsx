@@ -84,11 +84,11 @@ const Welcome: React.FC = () => {
         </div>
       ) : (
         <div className="max-w-md w-full space-y-8">
-          <span className="flex justify-center">
+          <span className="flex justify-center border rounded-lg border-gray-200  mb-4 shadow-sm bg-gray-500 p-5">
             <img src={Logo} alt="App Logo" className="h-15 w-full" />
           </span>
           <div className="text-center">
-            <h1 className="welcome-title text-4xl font-bold text-gray-100 mb-4">
+            <h1 className="welcome-title text-4xl font-bold text-gray-600 mb-4">
               {/* {t('welcome')} */}
               {t('hello', { name: userName })}
             </h1>
