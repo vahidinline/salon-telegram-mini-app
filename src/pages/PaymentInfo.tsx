@@ -7,14 +7,6 @@ import { convertToPersianNumber } from '../utils/NumberFarsi';
 
 function PaymentInfo() {
   const location = useLocation();
-  const { service, employee } = location.state || {};
-
-  if (!service || !employee)
-    return (
-      <div className="min-h-screen flex items-center justify-center text-gray-500">
-        در حال بارگذاری...
-      </div>
-    );
 
   return (
     <div className="min-h-screen pb-20">
@@ -52,11 +44,11 @@ function PaymentInfo() {
             </div>
 
             <div className="flex flex-col text-sm text-gray-700 mt-2">
-              <p>
+              {/* <p>
                 رزرو وقت <strong>{service.name}</strong> با{' '}
                 <strong>{employee.name}</strong> برای <strong>{'date'}</strong>{' '}
                 انجام شد.
-              </p>
+              </p> */}
             </div>
           </div>
         </div>
