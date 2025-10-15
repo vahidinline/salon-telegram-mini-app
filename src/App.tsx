@@ -15,7 +15,7 @@ import ConfirmBooking from './pages/ConfirmBooking';
 import BookingHistory from './pages/BookingHistory';
 import { initTelegramWebApp } from './utils/telegram';
 import PaymentInfo from './pages/PaymentInfo';
-import BackButton from './components/GoBack';
+import HeaderButtons from './components/HeaderButtons';
 
 function App() {
   const { i18n } = useTranslation();
@@ -37,8 +37,8 @@ function App() {
           //   backgroundImage: `url(${Background})`,
           // }}
           className="min-h-screen bg-cover bg-center">
-          <div className="fixed flex flex-row justify-between  h-50 z-50 bg-[#6C7280] w-full">
-            <BackButton />
+          <div className="fixed flex flex-row h-50 z-50 w-full">
+            <HeaderButtons />
           </div>
           <Routes>
             <Route path="/" element={<Welcome />} />

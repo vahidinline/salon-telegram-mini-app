@@ -1,15 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import FileUpload from '../components/FileUpload';
 import CardNumberField from '../components/CardInfo';
 import Card from '../assets/img/bank-melat.jpg';
 import api from '../utils/api';
 import { showTelegramAlert } from '../utils/telegram';
+import TeleButton from '../components/TeleButton';
 
 function PaymentInfo() {
   const location = useLocation();
   const { bookingId } = location.state || {};
-
+  const navigate = useNavigate();
   const [booking, setBooking] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [uploadingReceipt, setUploadingReceipt] = useState(false);
@@ -180,6 +181,22 @@ function PaymentInfo() {
         {booking.status === 'confirmed' && (
           <p className="text-sm text-green-600 mt-3">رزرو تایید شده است.</p>
         )}
+      </div>
+
+      <div className="fixed flex justify-between bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4">
+        <TeleButton
+          onClick={() => navigate('/')}
+          variant="alert"
+          className=" flex items-center justify-center gap-2">
+          برگشت به خانه
+        </TeleButton>
+
+        <TeleButton
+          onClick={() => navigate('/bookings')}
+          variant="primary"
+          className=" flex items-center justify-center gap-2">
+          مدیریت رزروها
+        </TeleButton>
       </div>
     </div>
   );
