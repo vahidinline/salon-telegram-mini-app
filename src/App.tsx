@@ -37,8 +37,7 @@ function App() {
           //   backgroundImage: `url(${Background})`,
           // }}
           className="min-h-screen bg-cover bg-center">
-          <div className="fixed flex flex-row justify-between top-4 end-4 z-50">
-            {/* <LanguageSwitcher /> */}
+          <div className="fixed flex flex-row justify-between  h-50 z-50 bg-[#6C7280] w-full">
             <BackButton />
           </div>
           <Routes>

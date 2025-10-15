@@ -29,6 +29,8 @@ const ConfirmBooking: React.FC = () => {
   const userName = telegramUser?.first_name || 'Guest';
   const photoUrl = telegramUser?.photo_url || '';
   const telegramUserId = telegramUser?.id;
+  const [isGift, setIsGift] = useState(false);
+  const [recipientName, setRecipientName] = useState('');
 
   // ✅ Redirect if required data is missing
   useEffect(() => {
@@ -71,12 +73,19 @@ const ConfirmBooking: React.FC = () => {
   const handleVerified = () => setIsAuthenticated(true);
 
   const handleConfirm = async () => {
+    if (isGift && !recipientName.trim()) {
+      showTelegramAlert(t('pleaseEnterRecipientName'));
+      setLoading(false);
+      return;
+    }
+
     if (!bookingState.slot || !bookingState.service || !bookingState.employee)
       return;
 
     setLoading(true);
     try {
-      await api.post(`/salons/${salonId}/bookings`, {
+      // Send booking request
+      const response = await api.post(`/salons/${salonId}/bookings`, {
         salon: salonId,
         employee: bookingState.employee._id,
         service: bookingState.service._id,
@@ -85,20 +94,28 @@ const ConfirmBooking: React.FC = () => {
         user: telegramUserId,
         clientName: userName,
         clientPhone: localStorage.getItem('phoneNumber') || '',
+        orderType: isGift ? 'gift' : 'self',
+        recipientName: isGift ? recipientName : undefined,
       });
+
+      const bookingId = response.data.booking._id;
+
+      // Navigate and pass the booking ID in state
       navigate('/paymentinfo', {
         state: {
           service: bookingState.service,
           employee: bookingState.employee,
           date: bookingState.date,
           slot: bookingState.slot,
+          bookingId,
         },
       });
 
       setShowSuccess(true);
+
+      // Optional: reset booking after a delay
       setTimeout(() => {
         resetBooking();
-        navigate('/paymentinfo');
       }, 3000);
     } catch (error: any) {
       showTelegramAlert(error.response?.data?.message || t('error'));
@@ -247,6 +264,50 @@ const ConfirmBooking: React.FC = () => {
               </span>
             </div>
           </div>
+        </div>
+        <div className="bg-white rounded-lg shadow-sm p-6">
+          <h2 className="text-lg font-semibold text-gray-800 mb-4">
+            نوع سفارش
+          </h2>
+
+          <div className="flex items-center gap-4 mb-3">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="radio"
+                name="orderType"
+                checked={!isGift}
+                onChange={() => setIsGift(false)}
+                className="accent-blue-500"
+              />
+              برای خودم
+            </label>
+
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="radio"
+                name="orderType"
+                checked={isGift}
+                onChange={() => setIsGift(true)}
+                className="accent-blue-500"
+              />
+              برای شخص دیگر
+            </label>
+          </div>
+
+          {isGift && (
+            <div className="mt-3">
+              <input
+                type="text"
+                value={recipientName}
+                onChange={(e) => setRecipientName(e.target.value)}
+                placeholder="لطفا نام شخص را وارد کنید"
+                className="w-full border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              />
+              <p className="text-sm text-red-500 mt-1">
+                هزینه سفارشات هدیه باید کامل پرداخت شود تا رزرو تکمیل شود
+              </p>
+            </div>
+          )}
         </div>
 
         {!isAuthenticated ? (

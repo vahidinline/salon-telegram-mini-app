@@ -29,17 +29,21 @@ const BookingHistory: React.FC = () => {
 
   const fetchBookings = async () => {
     if (!userId) {
+      console.warn('⚠️ userId is missing, skipping fetch');
       setLoading(false);
       return;
     }
 
     try {
+      console.log('Fetching bookings for user:', userId);
+
       const response = await api.get(
-        `/salons/651a6b2f8b7a5a1d223e4c90/bookings`,
-        {
-          params: { user: userId },
-        }
+        `/salons/651a6b2f8b7a5a1d223e4c90/bookings?user=${encodeURIComponent(
+          userId
+        )}`
       );
+
+      console.log('✅ Response:', response.data);
       setBookings(response.data);
     } catch (error: any) {
       showTelegramAlert(error.response?.data?.message || t('error'));
@@ -96,7 +100,7 @@ const BookingHistory: React.FC = () => {
     <div className="min-h-screen  pb-20">
       <div className="bg-white shadow-sm sticky top-0 z-10">
         <div className="max-w-4xl mx-auto p-4">
-          <h1 className="text-2xl font-bold text-gray-800">
+          <h1 className="text-2xl font-bold mt-15 text-gray-800">
             {t('bookingHistory')}
           </h1>
         </div>
@@ -118,6 +122,16 @@ const BookingHistory: React.FC = () => {
             const canCancel =
               booking.status === 'pending' || booking.status === 'confirmed';
 
+            const statusLabels: Record<string, string> = {
+              pending: 'در انتظار پرداخت',
+              review: 'در حال بررسی',
+              confirmed: 'تایید شده',
+              cancelled: 'کنسل شده',
+              expired: 'منقضی شده',
+            };
+            const normalizedStatus =
+              statusLabels[booking.status] || booking.status;
+
             return (
               <div
                 key={booking._id}
@@ -130,9 +144,10 @@ const BookingHistory: React.FC = () => {
                     className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(
                       booking.status
                     )}`}>
-                    {t(booking.status || 'pending')}
+                    {normalizedStatus}
                   </span>
                 </div>
+                {booking?.user}
 
                 <div className="space-y-2 text-sm text-gray-600 mb-4">
                   <div className="flex items-center gap-2">
