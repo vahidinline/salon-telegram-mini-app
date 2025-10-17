@@ -52,7 +52,14 @@ export interface TelegramWebApp {
   ready(): void;
   expand(): void;
   close(): void;
-  showPopup(params: { title?: string; message: string; buttons?: Array<{ id?: string; type?: string; text: string }> }, callback?: (buttonId: string) => void): void;
+  showPopup(
+    params: {
+      title?: string;
+      message: string;
+      buttons?: Array<{ id?: string; type?: string; text: string }>;
+    },
+    callback?: (buttonId: string) => void
+  ): void;
   showAlert(message: string, callback?: () => void): void;
   showConfirm(message: string, callback?: (confirmed: boolean) => void): void;
   sendData(data: string): void;
@@ -85,8 +92,9 @@ export const getTelegramUser = (): TelegramUser | null => {
       first_name: 'Test',
       last_name: 'User',
       username: 'testuser',
-      language_code: 'fa'
+      language_code: 'fa',
     };
+    cancelationReason;
   }
 
   return null;
@@ -107,7 +115,10 @@ export const closeTelegramWebApp = (): void => {
   }
 };
 
-export const showTelegramAlert = (message: string, callback?: () => void): void => {
+export const showTelegramAlert = (
+  message: string,
+  callback?: () => void
+): void => {
   const tg = getTelegramWebApp();
   if (tg) {
     tg.showAlert(message, callback);
@@ -117,7 +128,10 @@ export const showTelegramAlert = (message: string, callback?: () => void): void 
   }
 };
 
-export const showTelegramConfirm = (message: string, callback?: (confirmed: boolean) => void): void => {
+export const showTelegramConfirm = (
+  message: string,
+  callback?: (confirmed: boolean) => void
+): void => {
   const tg = getTelegramWebApp();
   if (tg) {
     tg.showConfirm(message, callback);

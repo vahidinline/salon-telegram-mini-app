@@ -16,6 +16,7 @@ export interface Employee {
   endTime: string;
   avatar?: string;
   workSchedule?: string[];
+  cancelationReason?: string;
 }
 
 export interface TimeSlot {

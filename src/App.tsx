@@ -16,6 +16,7 @@ import BookingHistory from './pages/BookingHistory';
 import { initTelegramWebApp } from './utils/telegram';
 import PaymentInfo from './pages/PaymentInfo';
 import HeaderButtons from './components/HeaderButtons';
+import BookingManagement from './pages/BookingManagement';
 
 function App() {
   const { i18n } = useTranslation();
@@ -48,6 +49,8 @@ function App() {
             <Route path="/confirm" element={<ConfirmBooking />} />
             <Route path="/paymentinfo" element={<PaymentInfo />} />
             <Route path="/bookings" element={<BookingHistory />} />
+            <Route path="/bookingmanagement" element={<BookingManagement />} />
+
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </div>

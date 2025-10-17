@@ -10,6 +10,7 @@ import SlotCard from '../components/SlotCard';
 import TeleButton from '../components/TeleButton';
 import 'dayjs/locale/fa';
 import { convertToPersianNumber } from '../utils/NumberFarsi';
+import { useTelegramStore } from '../store/useTelegramStore';
 
 dayjs.extend(jalaliday);
 
@@ -22,9 +23,9 @@ const CalendarSlots: React.FC = () => {
   const [selectedSlot, setSelectedSlot] = useState<TimeSlot | null>(null);
   const [loading, setLoading] = useState(false);
   const [calendar, setCalendar] = useState<Date[]>([]);
-
+  const { user } = useTelegramStore();
   const isJalali = i18n.language === 'fa';
-
+  console.log('user', user);
   useEffect(() => {
     if (!bookingState.service || !bookingState.employee) {
       navigate('/services');
@@ -177,9 +178,7 @@ const CalendarSlots: React.FC = () => {
           {loading ? (
             <LoadingSpinner />
           ) : slots.length === 0 ? (
-            <div className="text-center py-12 text-white">
-              {t('noSlotsAvailable')}
-            </div>
+            <div className="text-center py-12 text-white">یبیبیبی</div>
           ) : (
             <div className="grid grid-cols-3 gap-3">
               {slots.map((slot, index) => (

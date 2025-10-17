@@ -9,16 +9,19 @@ import LoadingSpinner from '../components/LoadingSpinner';
 import TeleButton from '../components/TeleButton';
 import { showTelegramAlert, showTelegramConfirm } from '../utils/telegram';
 import { useStaggerAnimation } from '../hooks/useAnimations';
+import { useNavigate } from 'react-router-dom';
+import { useTelegramStore } from '../store/useTelegramStore';
 
 dayjs.extend(jalaliday);
 
 const BookingHistory: React.FC = () => {
   const { t, i18n } = useTranslation();
+  const { user } = useTelegramStore();
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const containerRef = useRef<HTMLDivElement>(null);
-
-  const userId = '1234567';
+  const navigate = useNavigate();
+  const userId = user?.id;
   const isJalali = i18n.language === 'fa';
 
   useStaggerAnimation('.booking-card', containerRef);
@@ -121,6 +124,9 @@ const BookingHistory: React.FC = () => {
             const employee = booking.employee as Employee;
             const canCancel =
               booking.status === 'pending' || booking.status === 'confirmed';
+            const bookingStart = dayjs(booking.start);
+            const canCancelTime = bookingStart.subtract(12, 'hour');
+            const isCancelable = dayjs().isBefore(canCancelTime);
 
             const statusLabels: Record<string, string> = {
               pending: 'در انتظار پرداخت',
@@ -169,16 +175,29 @@ const BookingHistory: React.FC = () => {
                 </div>
 
                 <div className="flex gap-3">
-                  <TeleButton
+                  {/* <TeleButton
                     onClick={() => handleCancelBooking(booking)}
                     variant="alert"
-                    className="w-full flex items-center justify-center gap-2">
-                    <XCircle size={18} />
-                    {t('cancelBooking')}
-                  </TeleButton>
+                    className="w-full flex items-center justify-center gap-2"
+                    disabled={!isCancelable} // disable button if less than 12h
+                  >
+                    {' '}
+                    {isCancelable ? (
+                      <>
+                        <XCircle size={18} />
+                        {t('cancelBooking')}
+                      </>
+                    ) : (
+                      'لغو رزرو امکان پذیر نیست'
+                    )}
+                  </TeleButton> */}
 
                   <TeleButton
-                    onClick={() => handleCancelBooking(booking)}
+                    onClick={() =>
+                      navigate('/bookingmanagement', {
+                        state: { bookingId: booking._id },
+                      })
+                    }
                     variant="primary"
                     className="w-full flex items-center justify-center gap-2">
                     <XCircle size={18} />

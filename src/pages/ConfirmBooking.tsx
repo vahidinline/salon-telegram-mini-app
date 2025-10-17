@@ -11,6 +11,7 @@ import api from '../utils/api';
 import { getTelegramUser, showTelegramAlert } from '../utils/telegram';
 import gsap from 'gsap';
 import { convertToPersianNumber } from '../utils/NumberFarsi';
+import { useTelegramStore } from '../store/useTelegramStore';
 
 dayjs.extend(jalaliday);
 
@@ -24,11 +25,11 @@ const ConfirmBooking: React.FC = () => {
   const successRef = useRef<HTMLDivElement>(null);
 
   const telegramUser = getTelegramUser();
+  const { user, setUser } = useTelegramStore();
   const salonId = import.meta.env.VITE_SALON_ID;
   const isJalali = i18n.language === 'fa';
   const userName = telegramUser?.first_name || 'Guest';
   const photoUrl = telegramUser?.photo_url || '';
-  const telegramUserId = telegramUser?.id;
   const [isGift, setIsGift] = useState(false);
   const [recipientName, setRecipientName] = useState('');
 
@@ -74,7 +75,7 @@ const ConfirmBooking: React.FC = () => {
 
   const handleConfirm = async () => {
     if (isGift && !recipientName.trim()) {
-      showTelegramAlert(t('pleaseEnterRecipientName'));
+      showTelegramAlert('لطفا نام را وارد کنید');
       setLoading(false);
       return;
     }
@@ -91,8 +92,8 @@ const ConfirmBooking: React.FC = () => {
         service: bookingState.service._id,
         start: bookingState.slot.start,
         end: bookingState.slot.end,
-        user: telegramUserId,
-        clientName: userName,
+        user: user?.id,
+        clientName: user?.username,
         clientPhone: localStorage.getItem('phoneNumber') || '',
         orderType: isGift ? 'gift' : 'self',
         recipientName: isGift ? recipientName : undefined,
@@ -294,7 +295,7 @@ const ConfirmBooking: React.FC = () => {
             </label>
           </div>
 
-          {isGift && (
+          {isGift ? (
             <div className="mt-3">
               <input
                 type="text"
@@ -306,6 +307,16 @@ const ConfirmBooking: React.FC = () => {
               <p className="text-sm text-red-500 mt-1">
                 هزینه سفارشات هدیه باید کامل پرداخت شود تا رزرو تکمیل شود
               </p>
+            </div>
+          ) : (
+            <div className="mt-3">
+              {/* <input
+                type="text"
+                value={user?.first_name || recipientName}
+                onChange={(e) => setRecipientName(e.target.value)}
+                placeholder="لطفا نام شخص را وارد کنید"
+                className="w-full border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              /> */}
             </div>
           )}
         </div>

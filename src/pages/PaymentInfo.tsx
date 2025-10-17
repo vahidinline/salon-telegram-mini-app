@@ -86,12 +86,6 @@ function PaymentInfo() {
 
       <div className="max-w-4xl mx-auto p-4 space-y-6">
         <div className="bg-white rounded-lg shadow-sm p-6">
-          <div className="flex justify-between mb-4">
-            <h2 className="text-lg font-semibold text-gray-800">
-              اطلاعات پرداخت رزرو
-            </h2>
-          </div>
-
           <div className="shadow-sm border rounded-lg">
             <img src={Card} alt="Bank card" className="rounded-lg" />
           </div>

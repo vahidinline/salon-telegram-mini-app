@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Search, Clock, DollarSign } from 'lucide-react';
+import { Clock } from 'lucide-react';
 import { Service } from '../types';
 import { useBooking } from '../context/BookingContext';
 import api from '../utils/api';
