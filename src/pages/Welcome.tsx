@@ -87,7 +87,6 @@ const Welcome: React.FC = () => {
     <div
       ref={containerRef}
       className="h-screen flex flex-col items-center justify-center bg-transparent p-6 ">
-      {user?.id}
       {showSplash ? (
         <div className="flex items-center justify-center">
           <Lottie

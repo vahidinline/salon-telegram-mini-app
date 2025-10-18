@@ -144,7 +144,7 @@ const BookingHistory: React.FC = () => {
                 className="booking-card bg-white rounded-lg shadow-sm p-4">
                 <div className="flex items-start justify-between mb-3">
                   <h3 className="text-lg font-semibold text-gray-800">
-                    {typeof service === 'object' ? service.name : 'ترمیم ناخن'}
+                    {service}
                   </h3>
                   <span
                     className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(
@@ -153,13 +153,14 @@ const BookingHistory: React.FC = () => {
                     {normalizedStatus}
                   </span>
                 </div>
-                {booking?.user}
+                {/* {booking?.user} */}
 
                 <div className="space-y-2 text-sm text-gray-600 mb-4">
                   <div className="flex items-center gap-2">
                     <User size={16} />
                     <span>
-                      {typeof employee === 'object' ? employee.name : 'مریم'}
+                      {/* {typeof employee === 'object' ? employee.name : 'مریم'} */}
+                      {employee}
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
