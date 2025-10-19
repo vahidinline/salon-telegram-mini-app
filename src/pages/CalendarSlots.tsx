@@ -10,7 +10,7 @@ import SlotCard from '../components/SlotCard';
 import TeleButton from '../components/TeleButton';
 import 'dayjs/locale/fa';
 import { convertToPersianNumber } from '../utils/NumberFarsi';
-import { useTelegramStore } from '../store/useTelegramStore';
+import api from '../utils/api';
 
 dayjs.extend(jalaliday);
 
@@ -23,9 +23,14 @@ const CalendarSlots: React.FC = () => {
   const [selectedSlot, setSelectedSlot] = useState<TimeSlot | null>(null);
   const [loading, setLoading] = useState(false);
   const [calendar, setCalendar] = useState<Date[]>([]);
-  const { user } = useTelegramStore();
   const isJalali = i18n.language === 'fa';
-  console.log('user', user);
+  console.log(
+    'Booking State:',
+    bookingState,
+    selectedDate,
+    slots,
+    selectedSlot
+  );
   useEffect(() => {
     if (!bookingState.service || !bookingState.employee) {
       navigate('/services');
@@ -48,52 +53,52 @@ const CalendarSlots: React.FC = () => {
     setCalendar(dates);
   };
 
-  const generateSlotsFrontend = () => {
-    const employee = bookingState.employee;
-    const service = bookingState.service;
+  // const generateSlotsFrontend = () => {
+  //   const employee = bookingState.employee;
+  //   const service = bookingState.service;
 
-    if (!employee || !service) return;
+  //   if (!employee || !service) return;
 
-    setLoading(true);
-    setSelectedSlot(null);
+  //   setLoading(true);
+  //   setSelectedSlot(null);
 
-    const dayName = dayjs(selectedDate).format('dddd').toLowerCase();
+  //   const dayName = dayjs(selectedDate).format('dddd').toLowerCase();
 
-    // ✅ Find today's schedule from workSchedule
-    const schedule = employee.workSchedule?.find(
-      (d: any) => d.day.toLowerCase() === dayName
-    );
+  //   // ✅ Find today's schedule from workSchedule
+  //   const schedule = employee.workSchedule?.find(
+  //     (d: any) => d.day.toLowerCase() === dayName
+  //   );
 
-    if (!schedule) {
-      setSlots([]);
-      setLoading(false);
-      return;
-    }
+  //   if (!schedule) {
+  //     setSlots([]);
+  //     setLoading(false);
+  //     return;
+  //   }
 
-    const [startHour, startMinute] = schedule.startTime
-      ? schedule.startTime.split(':').map(Number)
-      : [9, 0];
-    const [endHour, endMinute] = schedule.endTime
-      ? schedule.endTime.split(':').map(Number)
-      : [17, 0];
+  //   const [startHour, startMinute] = schedule.startTime
+  //     ? schedule.startTime.split(':').map(Number)
+  //     : [9, 0];
+  //   const [endHour, endMinute] = schedule.endTime
+  //     ? schedule.endTime.split(':').map(Number)
+  //     : [17, 0];
 
-    let current = dayjs(selectedDate).hour(startHour).minute(startMinute);
-    const end = dayjs(selectedDate).hour(endHour).minute(endMinute);
-    const duration = service.duration || 30;
+  //   let current = dayjs(selectedDate).hour(startHour).minute(startMinute);
+  //   const end = dayjs(selectedDate).hour(endHour).minute(endMinute);
+  //   const duration = service.duration || 30;
 
-    const slotList: TimeSlot[] = [];
-    while (
-      current.add(duration, 'minute').isBefore(end) ||
-      current.add(duration, 'minute').isSame(end)
-    ) {
-      const next = current.clone().add(duration, 'minute');
-      slotList.push({ start: current.toDate(), end: next.toDate() });
-      current = next;
-    }
+  //   const slotList: TimeSlot[] = [];
+  //   while (
+  //     current.add(duration, 'minute').isBefore(end) ||
+  //     current.add(duration, 'minute').isSame(end)
+  //   ) {
+  //     const next = current.clone().add(duration, 'minute');
+  //     slotList.push({ start: current.toDate(), end: next.toDate() });
+  //     current = next;
+  //   }
 
-    setSlots(slotList);
-    setLoading(false);
-  };
+  //   setSlots(slotList);
+  //   setLoading(false);
+  // };
 
   const handleContinue = () => {
     if (selectedSlot) {
@@ -112,6 +117,81 @@ const CalendarSlots: React.FC = () => {
     return isJalali
       ? dayjs(date).calendar('jalali').locale('fa').format('dddd')
       : dayjs(date).format('dddd');
+  };
+
+  const generateSlotsFrontend = async () => {
+    const employee = bookingState.employee;
+    const service = bookingState.service;
+    if (!employee || !service) return;
+
+    setLoading(true);
+    setSelectedSlot(null);
+
+    try {
+      // 1️⃣ Fetch booked slots for this date
+      const dateStr = dayjs(selectedDate).format('YYYY-MM-DD');
+
+      console.log('Sending to backend:', {
+        employee: employee._id,
+        dateStr,
+      });
+      const response = await api.get(
+        `/salons/651a6b2f8b7a5a1d223e4c90/employees/${employee._id}/availability`,
+        {
+          params: { employee: employee._id, date: dateStr },
+        }
+      );
+      const bookedSlots = response.data; // [{ start, end }]
+
+      // 2️⃣ Generate potential slots
+      const dayName = dayjs(selectedDate).format('dddd').toLowerCase();
+      const schedule = employee.workSchedule?.find(
+        (d: any) => d.day.toLowerCase() === dayName
+      );
+
+      if (!schedule) {
+        setSlots([]);
+        setLoading(false);
+        return;
+      }
+
+      const [startHour, startMinute] = schedule.startTime
+        ? schedule.startTime.split(':').map(Number)
+        : [9, 0];
+      const [endHour, endMinute] = schedule.endTime
+        ? schedule.endTime.split(':').map(Number)
+        : [17, 0];
+      const duration = service.duration || 30;
+
+      let current = dayjs(selectedDate).hour(startHour).minute(startMinute);
+      const end = dayjs(selectedDate).hour(endHour).minute(endMinute);
+
+      const slotList: TimeSlot[] = [];
+      while (
+        current.add(duration, 'minute').isBefore(end) ||
+        current.add(duration, 'minute').isSame(end)
+      ) {
+        const next = current.clone().add(duration, 'minute');
+        const newSlot = { start: current.toDate(), end: next.toDate() };
+
+        // 3️⃣ Check if this slot overlaps with any existing booking
+        const isOccupied = bookedSlots.some((b: any) => {
+          const bookingStart = dayjs(b.start);
+          const bookingEnd = dayjs(b.end);
+          return current.isBefore(bookingEnd) && next.isAfter(bookingStart);
+        });
+
+        if (!isOccupied) slotList.push(newSlot);
+
+        current = next;
+      }
+
+      setSlots(slotList);
+    } catch (err) {
+      console.error('Error fetching availability:', err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -178,7 +258,24 @@ const CalendarSlots: React.FC = () => {
           {loading ? (
             <LoadingSpinner />
           ) : slots.length === 0 ? (
-            <div className="text-center py-12 text-white">یبیبیبی</div>
+            <div className="flex flex-col items-center justify-center py-16 text-gray-300">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-12 w-12 mb-3 text-gray-400"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={1.5}>
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M8 7V3m8 4V3m-9 8h10m-9 4h8m-10 4h12a2 2 0 002-2V7a2 2 0 00-2-2h-3V3m-6 2H6a2 2 0 00-2 2v10a2 2 0 002 2z"
+                />
+              </svg>
+              <p className="text-sm font-medium text-gray-500">
+                هیچ زمان آزادی برای این روز وجود ندارد
+              </p>
+            </div>
           ) : (
             <div className="grid grid-cols-3 gap-3">
               {slots.map((slot, index) => (

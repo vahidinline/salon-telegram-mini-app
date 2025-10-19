@@ -40,7 +40,6 @@ const EmployeeSelect: React.FC = () => {
     }
 
     const fetchEmployees = async () => {
-      console.log('Fetching employees for salon:', salonId);
       try {
         const response = await api.get(
           `/salons/${salonId}/employees/${bookingState.service?._id}`,
