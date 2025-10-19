@@ -37,6 +37,9 @@ export interface Booking {
   telegramUserId?: number;
   status?: 'pending' | 'confirmed' | 'cancelled' | 'completed';
   createdAt?: string;
+  paymentDeadline?: string;
+  cancelationReason?: string;
+  receiptUrl?: string;
 }
 
 export interface User {

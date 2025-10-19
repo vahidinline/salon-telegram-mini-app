@@ -11,6 +11,10 @@ import { showTelegramAlert } from '../utils/telegram';
 import { useStaggerAnimation } from '../hooks/useAnimations';
 import { useTelegramStore } from '../store/useTelegramStore';
 import { useLocation } from 'react-router-dom';
+import CardNumberField from '../components/CardInfo';
+import PaymentCountdown from '../components/PaymentCountdown';
+import Card from '../assets/img/bank-melat.jpg';
+import FileUpload from '../components/FileUpload';
 
 dayjs.extend(jalaliday);
 
@@ -21,9 +25,14 @@ const BookingManagement: React.FC = () => {
   const location = useLocation();
   const { bookingId } = location.state || {};
   const containerRef = useRef<HTMLDivElement>(null);
-
+  const [uploadingReceipt, setUploadingReceipt] = useState(false);
+  const [sowPaymentInfo, setShowPaymentInfo] = useState(true);
   const { user } = useTelegramStore();
   const isJalali = i18n.language === 'fa';
+
+  const togglePaymentInfo = () => {
+    setShowPaymentInfo(!sowPaymentInfo);
+  };
 
   useStaggerAnimation('.booking-card', containerRef);
 
@@ -98,6 +107,30 @@ const BookingManagement: React.FC = () => {
     }
   };
 
+  const handleReceiptUploadComplete = async (fileUrl: string) => {
+    if (!bookingId) {
+      showTelegramAlert('شناسه رزرو موجود نیست');
+      return;
+    }
+
+    setUploadingReceipt(true);
+    try {
+      const res = await api.patch(
+        `salons/68c806bf374b8c596edb208c/bookings/${bookingId}/receipt`,
+        { receiptUrl: fileUrl }
+      );
+
+      setBooking(res.data.booking || res.data);
+      showTelegramAlert('رسید با موفقیت ارسال شد.');
+    } catch (err: any) {
+      console.error(err);
+      const msg = err.response?.data?.message || 'خطا در ثبت رسید';
+      showTelegramAlert(msg);
+    } finally {
+      setUploadingReceipt(false);
+    }
+  };
+
   const getCancelStatus = (status?: string) => {
     switch (status) {
       case 'byUser':
@@ -132,6 +165,16 @@ const BookingManagement: React.FC = () => {
   };
   const normalizedStatus = statusLabels[booking.status] || booking.status;
 
+  const cancelStatusLabels: Record<string, string> = {
+    byUser: 'کنسل شده توسط شما',
+    bySalon: 'کنسل شده توسط سالن',
+    unPaid: 'پرداخت نشده',
+    conflictingSchedule: 'برنامه زمانی متضاد',
+  };
+
+  const cancelStatus =
+    cancelStatusLabels[booking.cancelationReason] || booking.cancelationReason;
+
   return (
     <div className="min-h-screen pb-20">
       <div className="bg-white shadow-sm sticky top-0 z-10">
@@ -152,7 +195,7 @@ const BookingManagement: React.FC = () => {
               className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(
                 booking.status
               )}`}>
-              {normalizedStatus}
+              {normalizedStatus} {cancelStatus && `- ${cancelStatus}`}
             </span>
           </div>
 
@@ -185,6 +228,126 @@ const BookingManagement: React.FC = () => {
             )}
           </div>
 
+          <button onClick={togglePaymentInfo} className="text-sm text-blue-600">
+            {sowPaymentInfo
+              ? 'پنهان کردن اطلاعات پرداخت'
+              : 'نمایش اطلاعات پرداخت'}
+          </button>
+
+          {sowPaymentInfo && (
+            <div className="max-w-4xl mx-auto p-4 space-y-6">
+              <div className="bg-white rounded-lg shadow-sm p-6">
+                <div className="shadow-sm border rounded-lg">
+                  <img src={Card} alt="Bank card" className="rounded-lg" />
+                </div>
+
+                <div className="mt-4">
+                  <CardNumberField />
+                </div>
+
+                <div className="space-y-3 mt-4">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">نام صاحب کارت</span>
+                    <span className="font-medium">مرجان</span>
+                  </div>
+
+                  {/* <div className="flex justify-between">
+              <span className="text-gray-600">شماره تماس</span>
+              <span className="font-medium">{booking.clientPhone}</span>
+            </div> */}
+
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">وضعیت رزرو</span>
+                    <span
+                      className={`font-medium ${
+                        booking.status === 'pending'
+                          ? 'text-blue-600'
+                          : booking.status === 'review'
+                          ? 'text-yellow-600'
+                          : booking.status === 'confirmed'
+                          ? 'text-green-600'
+                          : booking.status === 'cancelled'
+                          ? 'text-gray-500'
+                          : booking.status === 'expired'
+                          ? 'text-red-500'
+                          : ''
+                      }`}>
+                      {normalizedStatus}
+                    </span>
+                  </div>
+
+                  {/* <div className="flex justify-between">
+              <span className="text-gray-600">تاریخ انقضای پرداخت</span>
+              <span className="font-medium text-red-500">
+                {new Date(booking.paymentDeadline).toLocaleString('fa-IR')}
+              </span>
+            </div> */}
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">
+                      زمان باقی‌مانده تا پرداخت
+                    </span>
+                    <PaymentCountdown
+                      deadline={booking.paymentDeadline}
+                      onExpire={() => {
+                        console.log('Deadline reached!');
+                        // Optionally: disable payment button, show modal, or redirect
+                      }}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {booking.receiptUrl && (
+                <div className="mt-3">
+                  <a
+                    href={booking.receiptUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-sm text-blue-600">
+                    مشاهده رسید ارسال‌شده
+                  </a>
+                </div>
+              )}
+
+              {booking.status === 'pending' && (
+                <div className="mt-4">
+                  <p className="text-sm text-red-500">
+                    لطفا مبلغ را حواله کنید و رسید آن را آپلود کنید. پس از بررسی
+                    رسید توسط تیم ما، رزرو شما تایید خواهد شد.
+                  </p>
+
+                  <FileUpload
+                    onUploadComplete={handleReceiptUploadComplete}
+                    label="آپلود رسید پرداخت"
+                    maxSizeMB={10}
+                    acceptedTypes={[
+                      'image/jpeg',
+                      'image/png',
+                      'application/pdf',
+                    ]}
+                  />
+
+                  {uploadingReceipt && (
+                    <p className="text-sm text-gray-500 mt-2">
+                      در حال ارسال رسید...
+                    </p>
+                  )}
+                </div>
+              )}
+
+              {booking.status === 'review' && (
+                <p className="text-sm text-yellow-600 mt-3">
+                  رسید دریافت شد — در حال بررسی توسط تیم ما
+                </p>
+              )}
+
+              {booking.status === 'confirmed' && (
+                <p className="text-sm text-green-600 mt-3">
+                  رزرو تایید شده است.
+                </p>
+              )}
+            </div>
+          )}
           <div className="flex gap-3">
             {isCancelable ? (
               <TeleButton

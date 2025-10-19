@@ -6,6 +6,7 @@ import Card from '../assets/img/bank-melat.jpg';
 import api from '../utils/api';
 import { showTelegramAlert } from '../utils/telegram';
 import TeleButton from '../components/TeleButton';
+import PaymentCountdown from '../components/PaymentCountdown';
 
 function PaymentInfo() {
   const location = useLocation();
@@ -59,9 +60,7 @@ function PaymentInfo() {
       );
 
       setBooking(res.data.booking || res.data);
-      showTelegramAlert(
-        'رسید با موفقیت ارسال شد. رزرو برای بازبینی علامت‌گذاری شد.'
-      );
+      showTelegramAlert('رسید با موفقیت ارسال شد.');
     } catch (err: any) {
       console.error(err);
       const msg = err.response?.data?.message || 'خطا در ثبت رسید';
@@ -100,10 +99,10 @@ function PaymentInfo() {
               <span className="font-medium">مرجان</span>
             </div>
 
-            <div className="flex justify-between">
+            {/* <div className="flex justify-between">
               <span className="text-gray-600">شماره تماس</span>
               <span className="font-medium">{booking.clientPhone}</span>
-            </div>
+            </div> */}
 
             <div className="flex justify-between">
               <span className="text-gray-600">وضعیت رزرو</span>
@@ -125,11 +124,21 @@ function PaymentInfo() {
               </span>
             </div>
 
-            <div className="flex justify-between">
+            {/* <div className="flex justify-between">
               <span className="text-gray-600">تاریخ انقضای پرداخت</span>
               <span className="font-medium text-red-500">
                 {new Date(booking.paymentDeadline).toLocaleString('fa-IR')}
               </span>
+            </div> */}
+            <div className="flex justify-between">
+              <span className="text-gray-600">زمان باقی‌مانده تا پرداخت</span>
+              <PaymentCountdown
+                deadline={booking.paymentDeadline}
+                onExpire={() => {
+                  console.log('Deadline reached!');
+                  // Optionally: disable payment button, show modal, or redirect
+                }}
+              />
             </div>
           </div>
         </div>
@@ -149,8 +158,8 @@ function PaymentInfo() {
         {booking.status === 'pending' && (
           <div className="mt-4">
             <p className="text-sm text-red-500">
-              لطفا مبلغ را حواله کنید و رسید آن را آپلود کنید. سپس تیم ما رسید
-              را بررسی می‌کند.
+              لطفا مبلغ را حواله کنید و رسید آن را آپلود کنید. پس از بررسی رسید
+              توسط تیم ما، رزرو شما تایید خواهد شد.
             </p>
 
             <FileUpload

@@ -11,6 +11,7 @@ import { showTelegramAlert, showTelegramConfirm } from '../utils/telegram';
 import { useStaggerAnimation } from '../hooks/useAnimations';
 import { useNavigate } from 'react-router-dom';
 import { useTelegramStore } from '../store/useTelegramStore';
+import PaymentCountdown from '../components/PaymentCountdown';
 
 dayjs.extend(jalaliday);
 
@@ -173,6 +174,18 @@ const BookingHistory: React.FC = () => {
                       {formatTime(booking.start)} - {formatTime(booking.end)}
                     </span>
                   </div>
+                </div>
+                <div className="flex justify-between mb-2">
+                  <span className="text-gray-600 text-sm">
+                    زمان باقی‌مانده تا پرداخت
+                  </span>
+                  <PaymentCountdown
+                    deadline={booking.paymentDeadline}
+                    onExpire={() => {
+                      console.log('Deadline reached!');
+                      // Optionally: disable payment button, show modal, or redirect
+                    }}
+                  />
                 </div>
 
                 <div className="flex gap-3">
