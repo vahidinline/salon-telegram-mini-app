@@ -1,10 +1,11 @@
 export interface Service {
   _id: string;
   name: string;
-  duration: number;
+  duration?: number;
   description?: string;
   price: number;
   employees?: string[];
+  serviceFeatures?: string[];
 }
 
 export interface Employee {
@@ -30,6 +31,7 @@ export interface Booking {
   salon: string;
   employee: Employee | string;
   service: Service | string;
+  additionalService: Service | string;
   start: string;
   end: string;
   user?: string;
@@ -51,6 +53,7 @@ export interface User {
 
 export interface BookingState {
   service: Service | null;
+  additionalService: Service | null;
   employee: Employee | null;
   date: Date | null;
   slot: TimeSlot | null;

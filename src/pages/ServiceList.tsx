@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Clock } from 'lucide-react';
+import { Clock, Search } from 'lucide-react';
 import { Service } from '../types';
 import { useBooking } from '../context/BookingContext';
 import api from '../utils/api';
@@ -54,7 +54,7 @@ const ServiceList: React.FC = () => {
 
   const handleSelectService = (service: Service) => {
     setService(service);
-    navigate('/employees');
+    navigate('/additionalservices');
   };
 
   if (loading) {
@@ -68,7 +68,7 @@ const ServiceList: React.FC = () => {
           <h1 className="text-2xl font-bold text-gray-800 mb-4">
             {t('selectService')}
           </h1>
-          {/* <div className="relative">
+          <div className="relative">
             <Search
               className="absolute start-3 top-1/2 transform -translate-y-1/2 text-gray-400"
               size={20}
@@ -80,7 +80,7 @@ const ServiceList: React.FC = () => {
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full ps-10 pe-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
-          </div> */}
+          </div>
         </div>
       </div>
 
@@ -103,14 +103,34 @@ const ServiceList: React.FC = () => {
                   {service.description}
                 </p>
               )}
+              {service.serviceFeatures?.length > 0 && (
+                <div>
+                  <p className="text-xs font-semibold text-gray-800 mb-2">
+                    {' '}
+                    خدمات و متریال مصرفی
+                  </p>
+
+                  <ul className="text-sm text-gray-600 mb-3 list-disc pr-5 space-y-1">
+                    {service.serviceFeatures.map((feature, index) => (
+                      <li
+                        className="list-image-[url(/src/assets/img/check.png)]"
+                        key={index}>
+                        {feature}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
               <div className="flex items-center justify-between text-sm">
                 <div className="flex items-center gap-1 text-gray-600">
                   <Clock size={16} />
+                  مدت زمان حدودی:
                   <span>
-                    {service.duration} {t('minutes')}
+                    {convertToPersianNumber(service.duration)} {t('minutes')}
                   </span>
                 </div>
-                <div className="flex items-center gap-1 text-blue-600 font-medium">
+                <div className="flex items-center gap-1 font-bold text-blue-600 ">
                   <span>
                     <span>
                       {service.price != null

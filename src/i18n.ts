@@ -61,6 +61,10 @@ const resources = {
       hello: 'سلام، {{name}}',
       chooseLang: 'انتخاب زبان',
       bookingManagement: 'مدیریت رزروها',
+      additionalServices: 'سرویس های اضافی',
+      additionalPrice: 'هزینه سرویس اضافی',
+      totalPrice: 'هزینه کل',
+      skip: 'نیازی به سرویس اضافه ندارم',
     },
   },
   en: {

@@ -17,6 +17,7 @@ import { initTelegramWebApp } from './utils/telegram';
 import PaymentInfo from './pages/PaymentInfo';
 import HeaderButtons from './components/HeaderButtons';
 import BookingManagement from './pages/BookingManagement';
+import AdditionalServiceList from './pages/AdditionalServices';
 
 function App() {
   const { i18n } = useTranslation();
@@ -44,6 +45,10 @@ function App() {
           <Routes>
             <Route path="/" element={<Welcome />} />
             <Route path="/services" element={<ServiceList />} />
+            <Route
+              path="/additionalservices"
+              element={<AdditionalServiceList />}
+            />
             <Route path="/employees" element={<EmployeeSelect />} />
             <Route path="/calendar" element={<CalendarSlots />} />
             <Route path="/confirm" element={<ConfirmBooking />} />

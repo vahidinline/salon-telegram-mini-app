@@ -90,6 +90,7 @@ const ConfirmBooking: React.FC = () => {
         salon: salonId,
         employee: bookingState.employee._id,
         service: bookingState.service._id,
+        additionalService: bookingState.additionalService,
         start: bookingState.slot.start,
         end: bookingState.slot.end,
         user: user?.id,
@@ -105,6 +106,7 @@ const ConfirmBooking: React.FC = () => {
       navigate('/paymentinfo', {
         state: {
           service: bookingState.service,
+          additionalService: bookingState.additionalService,
           employee: bookingState.employee,
           date: bookingState.date,
           slot: bookingState.slot,
@@ -132,12 +134,29 @@ const ConfirmBooking: React.FC = () => {
 
   const formatTime = (datetime?: string) =>
     datetime ? dayjs(datetime).format('HH:mm') : '';
-
   const formatJalaliDate = (date: string | Date) => {
     const jalaliDate = dayjs(date).calendar('jalali');
-    return `${convertToPersianNumber(jalaliDate.date())} ${jalaliDate.format(
-      'MMMM'
-    )} ${convertToPersianNumber(jalaliDate.year())}`;
+
+    const persianMonths = [
+      'فروردین',
+      'اردیبهشت',
+      'خرداد',
+      'تیر',
+      'مرداد',
+      'شهریور',
+      'مهر',
+      'آبان',
+      'آذر',
+      'دی',
+      'بهمن',
+      'اسفند',
+    ];
+
+    const day = convertToPersianNumber(jalaliDate.date());
+    const month = persianMonths[jalaliDate.month()];
+    const year = convertToPersianNumber(jalaliDate.year());
+
+    return `${day} ${month} ${year}`;
   };
 
   // ✅ Guard clause to prevent null render crash
@@ -232,6 +251,16 @@ const ConfirmBooking: React.FC = () => {
               <span className="text-gray-600">{t('employee')}:</span>
               <span className="font-medium">{bookingState.employee.name}</span>
             </div>
+            {bookingState.additionalService && (
+              <div className="flex justify-between">
+                <span className="text-gray-600">
+                  {t('additionalServices')}:
+                </span>
+                <span className="font-medium">
+                  {bookingState.additionalService.name}
+                </span>
+              </div>
+            )}
 
             <div className="flex justify-between">
               <span className="text-gray-600">{t('date')}:</span>
@@ -256,14 +285,43 @@ const ConfirmBooking: React.FC = () => {
               </span>
             </div>
 
-            <div className="flex justify-between text-lg pt-3 border-t">
+            <div className="flex  justify-between text-lg pt-3 border-t">
               <span className="text-gray-800 font-semibold">{t('price')}:</span>
               <span className="text-blue-600 font-bold">
                 {/* {convertToPersianNumber(bookingState.service.price)}{' '} */}
-                {bookingState.service.price}
+                {convertToPersianNumber(bookingState.service.price)}
                 {t('toman')}
               </span>
             </div>
+            {bookingState.additionalService && (
+              <>
+                <div className="flex justify-between text-lg pt-3 ">
+                  <span className="text-gray-800 font-semibold">
+                    {t('additionalPrice')}:
+                  </span>
+                  <span className="text-blue-600 font-bold">
+                    {/* {convertToPersianNumber(bookingState.service.price)}{' '} */}
+                    {convertToPersianNumber(
+                      bookingState.additionalService?.price
+                    )}
+                    {t('toman')}
+                  </span>
+                </div>
+                <div className="flex justify-between text-lg pt-3 ">
+                  <span className="text-gray-800 font-semibold">
+                    {t('totalPrice')}:
+                  </span>
+                  <span className="text-blue-600 font-bold">
+                    {/* {convertToPersianNumber(bookingState.service.price)}{' '} */}
+                    {convertToPersianNumber(
+                      bookingState.additionalService.price +
+                        bookingState.service.price
+                    )}
+                    {t('toman')}
+                  </span>
+                </div>
+              </>
+            )}
           </div>
         </div>
         <div className="bg-white rounded-lg shadow-sm p-6">
