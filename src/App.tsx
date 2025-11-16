@@ -18,6 +18,7 @@ import PaymentInfo from './pages/PaymentInfo';
 import HeaderButtons from './components/HeaderButtons';
 import BookingManagement from './pages/BookingManagement';
 import AdditionalServiceList from './pages/AdditionalServices';
+import WeeklyCalendar from './pages/WeeklyCalendar';
 
 function App() {
   const { i18n } = useTranslation();
@@ -43,7 +44,7 @@ function App() {
             <HeaderButtons />
           </div>
           <Routes>
-            <Route path="/" element={<Welcome />} />
+            {/* <Route path="/" element={<Welcome />} /> */}
             <Route path="/services" element={<ServiceList />} />
             <Route
               path="/additionalservices"
@@ -55,6 +56,7 @@ function App() {
             <Route path="/paymentinfo" element={<PaymentInfo />} />
             <Route path="/bookings" element={<BookingHistory />} />
             <Route path="/bookingmanagement" element={<BookingManagement />} />
+            <Route path="/" element={<WeeklyCalendar />} />
 
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>

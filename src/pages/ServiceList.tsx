@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Clock, Search } from 'lucide-react';
 import { Service } from '../types';
@@ -21,10 +21,14 @@ const ServiceList: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
 
   const salonId = import.meta.env.VITE_SALON_ID;
+  const [code, setCode] = useState();
+  const state = useLocation();
 
+  console.log(code);
   useStaggerAnimation('.service-card', containerRef);
 
   useEffect(() => {
+    setCode(state.state.code);
     const fetchServices = async () => {
       try {
         const response = await api.get(
@@ -90,62 +94,64 @@ const ServiceList: React.FC = () => {
             {t('noResults')}
           </div>
         ) : (
-          filteredServices.map((service) => (
-            <div
-              key={service._id}
-              onClick={() => handleSelectService(service)}
-              className=" service-card bg-white  rounded-lg shadow-sm p-4 cursor-pointer hover:shadow-md transition-all duration-200 active:scale-98">
-              <h3 className="text-lg font-semibold text-gray-800 mb-2">
-                {service.name}
-              </h3>
-              {service.description && (
-                <p className="text-sm text-gray-600 mb-3">
-                  {service.description}
-                </p>
-              )}
-              {service.serviceFeatures?.length > 0 && (
-                <div>
-                  <p className="text-xs font-semibold text-gray-800 mb-2">
-                    {' '}
-                    خدمات و متریال مصرفی
+          filteredServices
+            .filter((service) => service.code === code)
+            .map((service) => (
+              <div
+                key={service._id}
+                onClick={() => handleSelectService(service)}
+                className=" service-card bg-white  rounded-lg shadow-sm p-4 cursor-pointer hover:shadow-md transition-all duration-200 active:scale-98">
+                <h3 className="text-lg font-semibold text-gray-800 mb-2">
+                  {service.name}
+                </h3>
+                {service.description && (
+                  <p className="text-sm text-gray-600 mb-3">
+                    {service.description}
                   </p>
+                )}
+                {service.serviceFeatures?.length > 0 && (
+                  <div>
+                    <p className="text-xs font-semibold text-gray-800 mb-2">
+                      {' '}
+                      خدمات و متریال مصرفی
+                    </p>
 
-                  <ul className="text-sm text-gray-600 mb-3 list-disc pr-5 space-y-1">
-                    {service.serviceFeatures.map((feature, index) => (
-                      <li
-                        className="list-image-[url(/src/assets/img/check.png)]"
-                        key={index}>
-                        {feature}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
+                    <ul className="text-sm text-gray-600 mb-3 list-disc pr-5 space-y-1">
+                      {service.serviceFeatures.map((feature, index) => (
+                        <li
+                          className="list-image-[url(/src/assets/img/check.png)]"
+                          key={index}>
+                          {feature}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
 
-              <div className="flex items-center justify-between text-sm">
-                <div className="flex items-center gap-1 text-gray-600">
-                  <Clock size={16} />
-                  مدت زمان حدودی:
-                  <span>
-                    {convertToPersianNumber(service.duration)} {t('minutes')}
-                  </span>
-                </div>
-                <div className="flex items-center gap-1 font-bold text-blue-600 ">
-                  <span>
+                <div className="flex items-center justify-between text-sm">
+                  <div className="flex items-center gap-1 text-gray-600">
+                    <Clock size={16} />
+                    مدت زمان حدودی:
                     <span>
-                      {service.price != null
-                        ? convertToPersianNumber(
-                            service.price.toLocaleString()
-                          ) +
-                          ' ' +
-                          t('toman')
-                        : '-'}{' '}
+                      {convertToPersianNumber(service.duration)} {t('minutes')}
                     </span>
-                  </span>
+                  </div>
+                  <div className="flex items-center gap-1 font-bold text-blue-600 ">
+                    <span>
+                      <span>
+                        {service.price != null
+                          ? convertToPersianNumber(
+                              service.price.toLocaleString()
+                            ) +
+                            ' ' +
+                            t('toman')
+                          : '-'}{' '}
+                      </span>
+                    </span>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))
+            ))
         )}
       </div>
     </div>

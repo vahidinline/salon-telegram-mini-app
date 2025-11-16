@@ -1119,10 +1119,17 @@ csstype@^3.0.2:
   resolved "https://registry.npmjs.org/csstype/-/csstype-3.1.3.tgz"
   integrity sha512-M1uQkMl8rQK/szD0LNhtqxIPLpimGm8sOBwU7lLnCpSbTyY3yeU1Vc7l4KT5zT4s/yOxHH5O7tIuuLOCnLADRw==
 
-dayjs@^1.11.18:
-  version "1.11.18"
-  resolved "https://registry.npmjs.org/dayjs/-/dayjs-1.11.18.tgz"
-  integrity sha512-zFBQ7WFRvVRhKcWoUh+ZA1g2HVgUbsZm9sbddh8EC5iv93sui8DVVz1Npvz+r6meo9VKfa8NyLWBsQK1VvIKPA==
+dayjs-jalali@^0.0.2:
+  version "0.0.2"
+  resolved "https://registry.npmjs.org/dayjs-jalali/-/dayjs-jalali-0.0.2.tgz"
+  integrity sha512-pwsgYXAES7Jziyv+6l72t3ovoXRC4QTr0zjlCkbaWSvTxmgdnGOhp6nWIXO5b+fmCv0COWfYs7wwPP38fJrNVA==
+  dependencies:
+    jalaali-js "^1.1.0"
+
+dayjs@^1.11.19:
+  version "1.11.19"
+  resolved "https://registry.npmjs.org/dayjs/-/dayjs-1.11.19.tgz"
+  integrity sha512-t5EcLVS6QPBNqM2z8fakk/NKel+Xzshgt8FFKAn+qwlD1pzZWxh0nVCrvFK7ZDb6XucZeF9z8C7CBWTRIVApAw==
 
 debug@^4.1.0, debug@^4.3.1, debug@^4.3.2, debug@^4.3.4:
   version "4.3.7"
@@ -1682,6 +1689,11 @@ jackspeak@^3.1.2:
     "@isaacs/cliui" "^8.0.2"
   optionalDependencies:
     "@pkgjs/parseargs" "^0.11.0"
+
+jalaali-js@^1.1.0, jalaali-js@^1.2.8:
+  version "1.2.8"
+  resolved "https://registry.npmjs.org/jalaali-js/-/jalaali-js-1.2.8.tgz"
+  integrity sha512-Jl/EwY84JwjW2wsWqeU4pNd22VNQ7EkjI36bDuLw31wH98WQW4fPjD0+mG7cdCK+Y8D6s9R3zLiQ3LaKu6bD8A==
 
 jalaliday@^3.1.1:
   version "3.1.1"

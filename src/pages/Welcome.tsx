@@ -86,44 +86,23 @@ const Welcome: React.FC = () => {
   return (
     <div
       ref={containerRef}
-      className="h-screen flex flex-col items-center justify-center bg-transparent p-6 ">
-      {showSplash ? (
-        <div className="flex items-center justify-center">
-          <Lottie
-            animationData={wellcomeAnimation}
-            loop={true}
-            style={{ width: '100%', height: '100%' }}
-          />
+      className="h-screen flex flex-col items-center justify-center bg-transparent p-2 ">
+      <div className="max-w-md w-full space-y-8">
+        <span className="flex justify-center border rounded-lg border-gray-200  shadow-sm bg-gray-500 p-5">
+          <img src={Logo} alt="App Logo" className="h-15 w-full" />
+        </span>
+        <div className="text-center">
+          <h1 className="welcome-title text-4xl font-bold text-gray-600 mb-4">
+            {t('hello', { name: userName })}
+          </h1>
         </div>
-      ) : (
-        <div className="max-w-md w-full space-y-8">
-          <span className="flex justify-center border rounded-lg border-gray-200 mb-4 shadow-sm bg-gray-500 p-5">
-            <img src={Logo} alt="App Logo" className="h-15 w-full" />
-          </span>
-          <div className="text-center">
-            <h1 className="welcome-title text-4xl font-bold text-gray-600 mb-4">
-              {t('hello', { name: userName })}
-            </h1>
-          </div>
+      </div>
 
-          <div className="space-y-4">
-            <TeleButton
-              onClick={() => navigate('/services')}
-              className="action-button w-full py-6 text-lg flex items-center justify-center gap-3">
-              <Calendar size={24} />
-              {t('reserve')}
-            </TeleButton>
-
-            <TeleButton
-              onClick={() => navigate('/bookings')}
-              variant="secondary"
-              className="action-button w-full py-6 text-lg flex items-center justify-center gap-3">
-              <History size={24} />
-              {t('bookingHistory')}
-            </TeleButton>
-          </div>
+      <div className="static">
+        <div className="absolute bottom-0 ">
+          <p>نسخه ۰.۰.۳ </p>
         </div>
-      )}
+      </div>
     </div>
   );
 };

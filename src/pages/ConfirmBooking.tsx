@@ -25,7 +25,7 @@ const ConfirmBooking: React.FC = () => {
   const successRef = useRef<HTMLDivElement>(null);
 
   const telegramUser = getTelegramUser();
-  const { user, setUser } = useTelegramStore();
+  const { user } = useTelegramStore();
   const salonId = import.meta.env.VITE_SALON_ID;
   const isJalali = i18n.language === 'fa';
   const userName = telegramUser?.first_name || 'Guest';

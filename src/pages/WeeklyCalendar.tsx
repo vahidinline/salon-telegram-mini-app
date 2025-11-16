@@ -1,0 +1,327 @@
+import React, { useEffect, useState } from 'react';
+import dayjs from 'dayjs';
+import jalaliday from 'jalaliday';
+import { useTranslation } from 'react-i18next';
+import api from '../utils/api';
+import 'dayjs/locale/fa';
+import Lottie from 'lottie-react';
+dayjs.extend(jalaliday);
+import wellcomeAnimation from '../assets/img/wellcome.json';
+import Welcome from './Welcome';
+import { useNavigate } from 'react-router-dom';
+
+interface DayStatus {
+  date: string;
+  hasWorkingEmployee: boolean;
+  hasFreeSlot: boolean;
+}
+
+const WeeklyCalendar: React.FC<{
+  salonId: string;
+  onDaySelect: (date: string) => void;
+}> = ({ salonId, onDaySelect }) => {
+  const { i18n } = useTranslation();
+  const isJalali = i18n.language === 'fa';
+  const navigate = useNavigate();
+  const [week, setWeek] = useState<DayStatus[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [selectedDay, setSelectedDay] = useState<any | null>(null);
+
+  useEffect(() => {
+    generateWeek();
+  }, []);
+
+  const handleSelectedDay = () => {
+    setSelectedDay(null);
+  };
+
+  const generateWeek = async () => {
+    setLoading(true);
+
+    const promises = Array.from({ length: 7 }).map(async (_, i) => {
+      const dateObj = dayjs().add(i, 'day');
+      const dateStr = dateObj.format('YYYY-MM-DD');
+
+      try {
+        const res = await api.get(
+          `/salons/651a6b2f8b7a5a1d223e4c90/availability/freeslots`,
+          { params: { date: dateStr } }
+        );
+        console.log('res', res);
+        const employees = res.data;
+
+        const weekday = dateObj
+          .toDate()
+          .toLocaleDateString('en-US', { weekday: 'long' })
+          .toLowerCase();
+
+        const enhancedEmployees = employees.map((e: any) => ({
+          ...e,
+          worksToday: e.employee.workSchedule.some(
+            (w: any) => w.day.toLowerCase() === weekday
+          ),
+        }));
+
+        const hasWorkingEmployee = enhancedEmployees.some(
+          (e: any) => e.worksToday
+        );
+        const hasFreeSlot = enhancedEmployees.some(
+          (e: any) => e.worksToday && e.hasFreeSlot
+        );
+
+        return {
+          date: dateStr,
+          hasWorkingEmployee,
+          hasFreeSlot,
+          employees: enhancedEmployees, // ⬅ مهم
+        };
+      } catch (error) {
+        return {
+          date: dateStr,
+          hasWorkingEmployee: false,
+          hasFreeSlot: false,
+          employees: [],
+        };
+      }
+    });
+
+    const results = await Promise.all(promises);
+    setWeek(results);
+    setLoading(false);
+  };
+
+  const categories = [
+    {
+      name: 'رز | خدمات Basic  تیم Nials By Marjan',
+      description:
+        'خدمات رز شامل سرویس Basic است که توسط اعضای تیم Nails By Marjan ارائه می شود.',
+      type: 'Basic',
+      code: 'rose',
+    },
+    {
+      name: 'لی لی | خدمات Basic  توسط خانم مرجان ترکمن',
+      description:
+        'خدمات لی لی شامل سرویس Basic است که توسط خانم ترکمن ارائه می شود.',
+      type: 'Basic',
+      code: 'lily',
+    },
+    {
+      name: 'ارکیده | خدمات VIP  تیم Nials By Marjan',
+      description:
+        'خدمات ارکیده شامل سرویس VIP است که توسط اعضای تیم Nails By Marjan ارائه می شود.',
+      type: 'Vip',
+      code: 'orchid',
+    },
+    {
+      name: 'پیونی | خدمات VIP  توسط خانم مرجان ترکمن',
+      description:
+        'خدمات پیونی شامل سرویس VIP است که توسط خانم مرجان ارائه می شود.',
+      type: 'Vip',
+      code: 'peony',
+    },
+  ];
+
+  // const generateWeek = async () => {
+  //   const temp: DayStatus[] = [];
+  //   setLoading(true);
+
+  //   for (let i = 0; i < 7; i++) {
+  //     const dateObj = dayjs().add(i, 'day');
+  //     const dateStr = dateObj.format('YYYY-MM-DD');
+
+  //     try {
+  //       const res = await api.get(
+  //         `/salons/651a6b2f8b7a5a1d223e4c90/availability/freeslots`,
+  //         {
+  //           params: { date: dateStr },
+  //         }
+  //       );
+
+  //       const employees = res.data;
+  //       console.log('employees', employees);
+  //       const hasWorkingEmployee = employees.some(
+  //         (e: any) =>
+  //           !!e.employee.workSchedule.find((w: any) => {
+  //             const weekday = dateObj
+  //               .toDate()
+  //               .toLocaleDateString('en-US', { weekday: 'long' })
+  //               .toLowerCase();
+  //             return w.day.toLowerCase() === weekday;
+  //           })
+  //       );
+
+  //       const hasFreeSlot = employees.some((e: any) => e.hasFreeSlot);
+
+  //       temp.push({
+  //         date: dateStr,
+  //         hasWorkingEmployee,
+  //         hasFreeSlot,
+  //       });
+  //     } catch (e) {
+  //       temp.push({
+  //         date: dateStr,
+  //         hasWorkingEmployee: false,
+  //         hasFreeSlot: false,
+  //       });
+  //     }
+  //   }
+
+  //   setWeek(temp);
+  //   setLoading(false);
+  // };
+
+  const persianNumber = (num: string | number) =>
+    num.toString().replace(/\d/g, (d) => '۰۱۲۳۴۵۶۷۸۹'[parseInt(d)]);
+
+  const formatDate = (date: string) => {
+    if (isJalali) {
+      const d = dayjs(date).locale('fa').calendar('jalali');
+      // format day with Persian numerals and full month name
+      const day = persianNumber(d.format('D'));
+      const month = d.format('MMMM'); // full month name
+      const weekday = d.format('dddd'); // weekday name
+      return `${weekday} ${day} ${month}`;
+    } else {
+      return dayjs(date).format('dddd, MMM D');
+    }
+  };
+
+  if (loading)
+    return (
+      <div className="p-4  text-center">
+        {' '}
+        <div className="flex mt-10 items-center justify-center">
+          <Lottie
+            animationData={wellcomeAnimation}
+            loop={true}
+            style={{ width: '100%', height: '100%' }}
+          />
+        </div>
+      </div>
+    );
+
+  return (
+    <div className="p-4 space-y-3 h-screen flex flex-col items-center justify-center bg-transparent p-6 ">
+      <Welcome />
+      {week.map((day) => {
+        const disabled = !day.hasWorkingEmployee;
+
+        return (
+          <button
+            key={day.date}
+            disabled={disabled}
+            onClick={() => setSelectedDay(day)} // ⬅ روز انتخاب شده ذخیره می‌شود
+            className={`w-full text-left p-4 rounded-xl border flex justify-between items-center
+    ${
+      disabled
+        ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+        : 'bg-white hover:bg-blue-50'
+    }
+  `}>
+            <span className="font-semibold">{formatDate(day.date)}</span>
+
+            {disabled ? (
+              <span className="text-gray-400">روز تعطیل</span>
+            ) : day.hasFreeSlot ? (
+              <span className="text-green-600 font-bold"> انتخاب روز</span>
+            ) : (
+              <span className="text-red-500 font-bold">
+                همه وقت‌ها پر هستند
+              </span>
+            )}
+          </button>
+        );
+      })}
+      {selectedDay && (
+        <div className="relative w-full mt-1 p-2 bg-white rounded-xl shadow-md border">
+          {/* Top Row: Close Button (Left) + Title (Right) */}
+          <div className="flex items-center justify-between px-2 py-1 absolute top-2 left-0 right-0">
+            {/* Title Text */}
+            <span className="text-gray-700 font-medium text-sm">
+              خدمات قابل ارائه در روز {formatDate(selectedDay.date)}
+            </span>
+            {/* Close Button */}
+            <button
+              onClick={() => handleSelectedDay()}
+              className="p-1 rounded-full hover:bg-gray-100 transition">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="26"
+                height="26"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="text-gray-600">
+                <circle cx="12" cy="12" r="10" />
+                <path d="m15 9-6 6" />
+                <path d="m9 9 6 6" />
+              </svg>
+            </button>
+          </div>
+
+          {/* Add padding so content doesn't overlap top bar */}
+          <div className="pt-12">
+            {selectedDay.employees.length === 0 && (
+              <p className="text-gray-500">
+                هیچ کارمندی برای این روز ثبت نشده است.
+              </p>
+            )}
+
+            <div className="space-y-2">
+              {categories.map((c, idx) => {
+                const isVIP = c.type?.toLowerCase() === 'vip';
+
+                return (
+                  <div
+                    onClick={() => {
+                      navigate('/services', {
+                        state: { code: c.code },
+                      });
+                    }}
+                    key={idx}
+                    className={`
+              p-4 border rounded-xl transition shadow-sm
+              ${
+                isVIP
+                  ? 'bg-gradient-to-br from-[#fdf5e6] via-[#fff8dc] to-[#f5e6c4] border-yellow-400 shadow-[0_0_12px_rgba(255,215,0,0.4)]'
+                  : 'bg-gray-50 border-gray-300'
+              }
+            `}>
+                    {/* VIP Badge */}
+                    {isVIP && (
+                      <div className="flex items-center gap-1 mb-2">
+                        <span className="text-yellow-600 font-semibold text-sm">
+                          VIP Service
+                        </span>
+                        <span className="text-yellow-600">✨</span>
+                      </div>
+                    )}
+
+                    <span
+                      className={`block font-semibold text-lg ${
+                        isVIP ? 'text-yellow-700' : 'text-gray-800'
+                      }`}>
+                      {c.name}
+                    </span>
+
+                    <p
+                      className={`text-sm mt-1 ${
+                        isVIP ? 'text-yellow-800/90' : 'text-gray-600'
+                      }`}>
+                      {c.description}
+                    </p>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default WeeklyCalendar;

@@ -6,6 +6,8 @@ export interface Service {
   price: number;
   employees?: string[];
   serviceFeatures?: string[];
+  code: string;
+  type: string;
 }
 
 export interface Employee {
