@@ -1,19 +1,15 @@
 import React, { useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Calendar, History } from 'lucide-react';
 import { getTelegramUser } from '../utils/telegram';
-import TeleButton from '../components/TeleButton';
 import Logo from '../assets/img/logo.png';
 import gsap from 'gsap';
 import { usePrefersReducedMotion } from '../hooks/useAnimations';
-import Lottie from 'lottie-react';
-import wellcomeAnimation from '../assets/img/wellcome.json';
 import { useTelegramStore } from '../store/useTelegramStore';
 
 const Welcome: React.FC = () => {
   const { t } = useTranslation();
-  const navigate = useNavigate();
+
   const containerRef = useRef<HTMLDivElement>(null);
   const prefersReducedMotion = usePrefersReducedMotion();
   const [showSplash, setShowSplash] = React.useState(true);
@@ -86,23 +82,23 @@ const Welcome: React.FC = () => {
   return (
     <div
       ref={containerRef}
-      className="h-screen flex flex-col items-center justify-center bg-transparent p-2 ">
-      <div className="max-w-md w-full space-y-8">
-        <span className="flex justify-center border rounded-lg border-gray-200  shadow-sm bg-gray-500 p-5">
+      className=" flex flex-col items-center max-h-screen justify-center bg-[#d6a78f] p-2 overflow-auto">
+      <div className="max-w-md w-full  space-y-8">
+        <span className="flex justify-center   p-5">
           <img src={Logo} alt="App Logo" className="h-15 w-full" />
         </span>
         <div className="text-center">
-          <h1 className="welcome-title text-4xl font-bold text-gray-600 mb-4">
+          <h1 className="welcome-title text-4xl font-bold text-gray-100 mb-4">
             {t('hello', { name: userName })}
           </h1>
         </div>
       </div>
 
-      <div className="static">
-        <div className="absolute bottom-0 ">
-          <p>نسخه ۰.۰.۳ </p>
+      {/* <div className="static ">
+        <div className="absolute bottom-0 right-1 text-white text-xs">
+          <p>نسخه ۰.۰.۴ </p>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };

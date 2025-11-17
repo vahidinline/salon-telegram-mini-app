@@ -35,7 +35,7 @@ const EmployeeSelect: React.FC = () => {
 
   useEffect(() => {
     if (!bookingState.service) {
-      navigate('/services');
+      navigate('/');
       return;
     }
 
@@ -71,19 +71,21 @@ const EmployeeSelect: React.FC = () => {
 
   return (
     <div className="min-h-screen pb-20">
-      <div className="bg-white shadow-sm sticky top-0 z-10">
+      <div className="bg-[#d6a78f] shadow-sm sticky top-0 z-10">
         <div className="max-w-4xl mx-auto p-4">
-          <h1 className="text-2xl font-bold text-gray-800 mb-2">
+          <h1 className="text-2xl font-bold text-gray-100 mb-2">
             {t('selectEmployee')}
           </h1>
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-gray-200">
             {t('service')}:{' '}
             <span className="font-medium">{bookingState.service?.name}</span>
           </p>
         </div>
       </div>
 
-      <div ref={containerRef} className="max-w-4xl mx-auto p-4 space-y-3">
+      <div
+        ref={containerRef}
+        className="max-w-4xl bg-[#d6a78f] mx-auto p-4 space-y-3">
         {employees.length === 0 ? (
           <div className="text-center py-12 text-gray-500">
             {t('noResults')}
@@ -92,25 +94,25 @@ const EmployeeSelect: React.FC = () => {
           employees.map((employee) => (
             <div
               key={employee._id}
-              className="employee-card bg-white rounded-lg shadow-sm p-4">
-              <div className="flex items-start gap-4 mb-4">
-                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-400 to-cyan-500 flex items-center justify-center text-white">
-                  {employee.avatar ? (
-                    <img
-                      src={employee.avatar}
-                      alt={employee.name}
-                      className="w-full h-full rounded-full object-cover"
-                    />
-                  ) : (
-                    <User size={32} />
-                  )}
-                </div>
-
-                <div className="flex-1">
-                  <h3 className="text-lg font-semibold text-gray-800">
+              className="employee-card bg-[#fffffa] rounded-lg shadow-sm p-4">
+              <div className="flex  items-start gap-4 mb-4">
+                <div className="flex flex-col">
+                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-400 to-cyan-500 flex items-center justify-center text-white">
+                    {employee.avatar ? (
+                      <img
+                        src={employee.avatar}
+                        alt={employee.name}
+                        className="w-full h-full rounded-full object-cover"
+                      />
+                    ) : (
+                      <User size={32} />
+                    )}
+                  </div>
+                  <h3 className="text-md text-center mt-2 font-semibold text-gray-800">
                     {employee.name}
                   </h3>
-
+                </div>
+                <div className="flex-1">
                   {/* ✅ Display work schedule dynamically */}
                   <div className="mt-2 space-y-1 text-sm text-gray-600">
                     {employee.workSchedule &&
@@ -119,11 +121,11 @@ const EmployeeSelect: React.FC = () => {
                         <div key={idx} className="flex items-center gap-2">
                           <CalendarIcon size={16} />
                           <span>{dayMap[dayItem.day] || dayItem.day}</span>
-                          {/* <Clock size={16} className="ml-1" />
+                          <Clock size={16} className="ml-1" />
                           <span>
                             {dayItem.startTime || '--:--'} -{' '}
                             {dayItem.endTime || '--:--'}
-                          </span> */}
+                          </span>
                         </div>
                       ))
                     ) : (
@@ -132,14 +134,13 @@ const EmployeeSelect: React.FC = () => {
                       </span>
                     )}
                   </div>
+                  <TeleButton
+                    onClick={() => handleSelectEmployee(employee)}
+                    className=" text-xs">
+                    {t('selectEmployee')}
+                  </TeleButton>
                 </div>
               </div>
-
-              <TeleButton
-                onClick={() => handleSelectEmployee(employee)}
-                className="w-full">
-                {t('selectEmployee')} {employee.name}
-              </TeleButton>
             </div>
           ))
         )}

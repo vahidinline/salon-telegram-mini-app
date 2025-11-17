@@ -196,12 +196,12 @@ const CalendarSlots: React.FC = () => {
 
   return (
     <div className="min-h-screen pb-20">
-      <div className="bg-white shadow-sm sticky top-0 z-10">
+      <div className="bg-[#d6a78f] shadow-sm sticky top-0 z-10">
         <div className="max-w-4xl mx-auto p-4">
-          <h1 className="text-2xl font-bold text-gray-800 mb-2">
+          <h1 className="text-2xl font-bold text-white mb-2">
             {t('selectDateTime')}
           </h1>
-          <div className="text-sm text-gray-600 space-y-1">
+          <div className="text-sm text-gray-100 space-y-1">
             <p>
               {t('service')}:{' '}
               <span className="font-medium">{bookingState.service?.name}</span>
@@ -214,13 +214,13 @@ const CalendarSlots: React.FC = () => {
         </div>
       </div>
 
-      <div className="max-w-4xl mx-auto p-4 space-y-6">
+      <div className="max-w-4xl bg-[#d6a78f] h-screen mx-auto p-4 space-y-6">
         <div>
           <h2 className="text-lg font-semibold text-white mb-3">
             {t('selectDate')}
           </h2>
           <div className="overflow-x-auto pb-2">
-            <div className="flex gap-2 min-w-max">
+            <div className="grid grid-cols-4 gap-2  min-w-max">
               {calendar.map((date, index) => {
                 const isSelected = dayjs(date).isSame(selectedDate, 'day');
                 return (

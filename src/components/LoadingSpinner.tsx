@@ -14,7 +14,7 @@ const LoadingSpinner: React.FC = () => {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        // backgroundColor: '#fff', // or Telegram theme background
+        //backgroundColor: '#fffffa', // or Telegram theme background
       }}>
       <Lottie
         animationData={Loading}

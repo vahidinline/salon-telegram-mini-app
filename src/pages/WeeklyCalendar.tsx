@@ -188,9 +188,9 @@ const WeeklyCalendar: React.FC<{
 
   if (loading)
     return (
-      <div className="p-4  text-center">
+      <div className="p-4 bg-[#d6a78f] h-screen text-center">
         {' '}
-        <div className="flex mt-10 items-center justify-center">
+        <div className="flex  items-center justify-center">
           <Lottie
             animationData={wellcomeAnimation}
             loop={true}
@@ -201,7 +201,7 @@ const WeeklyCalendar: React.FC<{
     );
 
   return (
-    <div className="p-4 space-y-3 h-screen flex flex-col items-center justify-center bg-transparent p-6 ">
+    <div className=" space-y-3 flex min-h-screen flex-col items-center justify-center bg-[#d6a78f] p-6 ">
       <Welcome />
       {week.map((day) => {
         const disabled = !day.hasWorkingEmployee;
@@ -233,11 +233,11 @@ const WeeklyCalendar: React.FC<{
         );
       })}
       {selectedDay && (
-        <div className="relative w-full mt-1 p-2 bg-white rounded-xl shadow-md border">
+        <div className="relative w-full mt-1 p-2 bg-[#d6a78f]  rounded-xl shadow-md border">
           {/* Top Row: Close Button (Left) + Title (Right) */}
           <div className="flex items-center justify-between px-2 py-1 absolute top-2 left-0 right-0">
             {/* Title Text */}
-            <span className="text-gray-700 font-medium text-sm">
+            <span className="text-gray-100 font-bold text-sm">
               خدمات قابل ارائه در روز {formatDate(selectedDay.date)}
             </span>
             {/* Close Button */}
@@ -254,7 +254,7 @@ const WeeklyCalendar: React.FC<{
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                className="text-gray-600">
+                className="text-gray-100">
                 <circle cx="12" cy="12" r="10" />
                 <path d="m15 9-6 6" />
                 <path d="m9 9 6 6" />

@@ -20,13 +20,13 @@ const HeaderButtons: React.FC = () => {
   const onRoot = location.pathname === '/';
 
   return (
-    <div className="flex flex-row justify-end items-center w-full mt-2 gap-2">
+    <div className="flex flex-row  justify-end items-center w-full mt-2 gap-2">
       {!onRoot && (
         <button
           onClick={handleBack}
           aria-label="Back"
           className="flex items-center p-2 text-gray-700">
-          <ArrowBigLeft />
+          <ArrowBigLeft color="white" />
         </button>
       )}
 

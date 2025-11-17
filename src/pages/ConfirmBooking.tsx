@@ -12,6 +12,7 @@ import { getTelegramUser, showTelegramAlert } from '../utils/telegram';
 import gsap from 'gsap';
 import { convertToPersianNumber } from '../utils/NumberFarsi';
 import { useTelegramStore } from '../store/useTelegramStore';
+import JalaliCalendar from '../components/JalaliCalendar';
 
 dayjs.extend(jalaliday);
 
@@ -23,7 +24,7 @@ const ConfirmBooking: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const successRef = useRef<HTMLDivElement>(null);
-
+  const [dob, setDob] = useState('');
   const telegramUser = getTelegramUser();
   const { user } = useTelegramStore();
   const salonId = import.meta.env.VITE_SALON_ID;
@@ -32,6 +33,10 @@ const ConfirmBooking: React.FC = () => {
   const photoUrl = telegramUser?.photo_url || '';
   const [isGift, setIsGift] = useState(false);
   const [recipientName, setRecipientName] = useState('');
+  let gregorianDob = null;
+  if (dob) {
+    gregorianDob = dayjs.from(dob, { jalali: true }).format('YYYY-MM-DD');
+  }
 
   // ✅ Redirect if required data is missing
   useEffect(() => {
@@ -41,7 +46,7 @@ const ConfirmBooking: React.FC = () => {
       !bookingState.date ||
       !bookingState.slot
     ) {
-      navigate('/services');
+      navigate('/');
       return;
     }
     const token = localStorage.getItem('token');
@@ -98,6 +103,7 @@ const ConfirmBooking: React.FC = () => {
         clientPhone: localStorage.getItem('phoneNumber') || '',
         orderType: isGift ? 'gift' : 'self',
         recipientName: isGift ? recipientName : undefined,
+        dob: gregorianDob,
       });
 
       const bookingId = response.data.booking._id;
@@ -175,7 +181,7 @@ const ConfirmBooking: React.FC = () => {
 
   if (showSuccess) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-6">
+      <div className="min-h-screen bg-[#d6a78f] flex items-center justify-center p-6">
         <div ref={successRef} className="relative text-center">
           <div className="absolute inset-0 pointer-events-none">
             {[...Array(20)].map((_, i) => (
@@ -189,7 +195,7 @@ const ConfirmBooking: React.FC = () => {
               />
             ))}
           </div>
-          <div className="bg-white rounded-full w-24 h-24 flex items-center justify-center mx-auto mb-6 shadow-lg">
+          <div className="bg-[#d6a78f] rounded-full w-24 h-24 flex items-center justify-center mx-auto mb-6 shadow-lg">
             <Check size={48} className="text-green-500" />
           </div>
           <h2 className="text-3xl font-bold text-gray-800 mb-4">
@@ -202,121 +208,107 @@ const ConfirmBooking: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen pb-20">
-      <div className="bg-white shadow-sm">
+    <div className="min-h-screen bg-[#d6a78f] pb-28 bg-gray-50">
+      {/* Header */}
+      <div className=" shadow-md sticky top-0 z-20">
         <div className="max-w-4xl mx-auto p-4">
-          <h1 className="text-2xl font-bold text-gray-800">
+          <h1 className="text-2xl font-bold text-gray-100">
             {t('confirmBooking')}
           </h1>
         </div>
       </div>
 
       <div className="max-w-4xl mx-auto p-4 space-y-6">
-        <div className="bg-white rounded-lg shadow-sm p-6">
-          <div className="flex justify-between gap-3 mb-4">
-            <h2 className="text-lg font-semibold text-gray-800">
-              {t('summary')}
-            </h2>
-          </div>
+        {/* Summary Card */}
+        <div className="bg-white rounded-2xl shadow-lg p-6 space-y-4">
+          <h2 className="text-lg font-semibold text-gray-800">
+            {t('summary')}
+          </h2>
 
-          <div className="flex items-center gap-3 mb-4 shadow-sm p-4 border rounded-lg">
-            <div className="flex flex-col items-center justify-center">
+          {/* Employee & User */}
+          <div className="flex items-center gap-4 p-4 border rounded-xl shadow-sm bg-gray-50">
+            <div className="flex flex-col items-center">
               <img
                 src={bookingState.employee.avatar}
                 alt={bookingState.employee.name}
-                className="w-12 h-12 rounded-full object-cover"
+                className="w-16 h-16 rounded-full object-cover border-2 border-blue-200"
               />
-              <span className="font-medium">{bookingState.employee.name}</span>
+              <span className="font-medium mt-1">
+                {bookingState.employee.name}
+              </span>
             </div>
-
-            <ArrowLeftRight size={30} className="mx-auto" />
-
-            <div className="flex flex-col items-center justify-center">
+            <ArrowLeftRight size={32} className="mx-auto text-gray-400" />
+            <div className="flex flex-col items-center">
               <img
                 src={photoUrl || ''}
                 alt={userName}
-                className="w-12 h-12 rounded-full object-cover"
+                className="w-16 h-16 rounded-full object-cover border-2 border-blue-200"
               />
-              <span className="font-medium">{userName}</span>
+              <span className="font-medium mt-1">{userName}</span>
             </div>
           </div>
 
-          <div className="space-y-3">
-            <div className="flex justify-between">
-              <span className="text-gray-600">{t('service')}:</span>
+          {/* Booking Details */}
+          <div className="space-y-2">
+            <div className="flex justify-between text-gray-600">
+              <span>{t('service')}:</span>
               <span className="font-medium">{bookingState.service.name}</span>
             </div>
-
-            <div className="flex justify-between">
-              <span className="text-gray-600">{t('employee')}:</span>
-              <span className="font-medium">{bookingState.employee.name}</span>
-            </div>
             {bookingState.additionalService && (
-              <div className="flex justify-between">
-                <span className="text-gray-600">
-                  {t('additionalServices')}:
-                </span>
-                <span className="font-medium">
+              <div className="flex justify-between gap-2 text-gray-600">
+                <span>{t('additionalServices')}:</span>
+                <span
+                  dir="rtl"
+                  className="font-medium text-xs text-right justify-center underline underline-offset-4">
                   {bookingState.additionalService.name}
                 </span>
               </div>
             )}
-
-            <div className="flex justify-between">
-              <span className="text-gray-600">{t('date')}:</span>
+            <div className="flex justify-between text-gray-600">
+              <span>{t('date')}:</span>
               <span className="font-medium">
                 {formatJalaliDate(bookingState.date)}
               </span>
             </div>
-
-            <div className="flex justify-between">
-              <span className="text-gray-600">{t('time')}:</span>
+            <div className="flex justify-between text-gray-600">
+              <span>{t('time')}:</span>
               <span className="font-medium">
                 {convertToPersianNumber(formatTime(bookingState.slot.start))} -{' '}
                 {convertToPersianNumber(formatTime(bookingState.slot.end))}
               </span>
             </div>
 
-            <div className="flex justify-between">
-              <span className="text-gray-600">{t('duration')}:</span>
-              <span className="font-medium">
-                {convertToPersianNumber(bookingState.service.duration)}{' '}
-                {t('minutes')}
-              </span>
-            </div>
-
-            <div className="flex  justify-between text-lg pt-3 border-t">
-              <span className="text-gray-800 font-semibold">{t('price')}:</span>
-              <span className="text-blue-600 font-bold">
-                {/* {convertToPersianNumber(bookingState.service.price)}{' '} */}
-                {convertToPersianNumber(bookingState.service.price)}
+            {/* Prices */}
+            <div className="pt-3 border-t flex justify-between items-center text-lg">
+              <span className="font-semibold text-gray-800">{t('price')}:</span>
+              <span className="font-bold text-blue-600">
+                {convertToPersianNumber(bookingState.service.price)}{' '}
                 {t('toman')}
               </span>
             </div>
+
             {bookingState.additionalService && (
               <>
-                <div className="flex justify-between text-lg pt-3 ">
-                  <span className="text-gray-800 font-semibold">
+                <div className="pt-2 flex justify-between items-center text-lg">
+                  <span className="font-semibold text-gray-800">
                     {t('additionalPrice')}:
                   </span>
-                  <span className="text-blue-600 font-bold">
-                    {/* {convertToPersianNumber(bookingState.service.price)}{' '} */}
+                  <span className="font-bold text-blue-600">
                     {convertToPersianNumber(
-                      bookingState.additionalService?.price
-                    )}
+                      bookingState.additionalService.price
+                    )}{' '}
                     {t('toman')}
                   </span>
                 </div>
-                <div className="flex justify-between text-lg pt-3 ">
-                  <span className="text-gray-800 font-semibold">
+                <div className="pt-2 flex justify-between items-center text-lg border-t">
+                  <span className="font-semibold text-gray-800">
                     {t('totalPrice')}:
                   </span>
-                  <span className="text-blue-600 font-bold">
-                    {/* {convertToPersianNumber(bookingState.service.price)}{' '} */}
+                  <span className="font-bold text-blue-600">
                     {convertToPersianNumber(
-                      bookingState.additionalService.price +
-                        bookingState.service.price
-                    )}
+                      bookingState.service.price +
+                        bookingState.additionalService.price
+                    )}{' '}
                     {t('toman')}
                   </span>
                 </div>
@@ -324,65 +316,62 @@ const ConfirmBooking: React.FC = () => {
             )}
           </div>
         </div>
-        <div className="bg-white rounded-lg shadow-sm p-6">
-          <h2 className="text-lg font-semibold text-gray-800 mb-4">
-            نوع سفارش
-          </h2>
 
-          <div className="flex items-center gap-4 mb-3">
-            <label className="flex items-center gap-2 cursor-pointer">
+        {/* Order Type Card */}
+        <div className="bg-white rounded-2xl shadow-lg p-6 space-y-4">
+          {/* <h2 className="text-lg font-semibold text-gray-800 mb-2">
+            {t('orderType')}
+          </h2> */}
+          <div className="flex flex-col  gap-6">
+            <label className="flex items-center gap-2 cursor-pointer text-gray-700 text-xs">
               <input
                 type="radio"
                 name="orderType"
                 checked={!isGift}
                 onChange={() => setIsGift(false)}
-                className="accent-blue-500"
+                className="accent-blue-500 w-5 h-5"
               />
-              برای خودم
+              این وقت رو برای خودم گرفتم
             </label>
 
-            <label className="flex items-center gap-2 cursor-pointer">
+            <label className="flex items-center gap-2 cursor-pointer text-gray-700 text-xs">
               <input
                 type="radio"
                 name="orderType"
                 checked={isGift}
                 onChange={() => setIsGift(true)}
-                className="accent-blue-500"
+                className="accent-blue-500 w-5 h-5"
               />
-              برای شخص دیگر
+              این وقت رو برای شخص دیگه ای گرفتم
             </label>
           </div>
 
-          {isGift ? (
+          {isGift && (
             <div className="mt-3">
               <input
                 type="text"
                 value={recipientName}
                 onChange={(e) => setRecipientName(e.target.value)}
                 placeholder="لطفا نام شخص را وارد کنید"
-                className="w-full border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                className="w-full border rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-400"
               />
               <p className="text-sm text-red-500 mt-1">
                 هزینه سفارشات هدیه باید کامل پرداخت شود تا رزرو تکمیل شود
               </p>
             </div>
-          ) : (
-            <div className="mt-3">
-              {/* <input
-                type="text"
-                value={user?.first_name || recipientName}
-                onChange={(e) => setRecipientName(e.target.value)}
-                placeholder="لطفا نام شخص را وارد کنید"
-                className="w-full border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
-              /> */}
-            </div>
           )}
+          <JalaliCalendar
+            value={dob}
+            onChange={setDob}
+            label="لطفا تاریخ تولد خود را وارد کنید"
+          />
         </div>
 
+        {/* Authentication / Confirm Button */}
         {!isAuthenticated ? (
-          <div className="bg-white rounded-lg shadow-sm p-6">
+          <div className="bg-white rounded-2xl shadow-lg p-6">
             <h2 className="text-lg font-semibold text-gray-800 mb-4">
-              {t('phone')}
+              لطفا شماره موبایل خود را وارد کنید
             </h2>
             <PhoneOTP
               onVerified={handleVerified}
@@ -393,7 +382,7 @@ const ConfirmBooking: React.FC = () => {
           <TeleButton
             onClick={handleConfirm}
             disabled={loading}
-            className="w-full py-4">
+            className="w-full py-4 rounded-xl bg-blue-600 text-white font-semibold hover:bg-blue-700 transition">
             {loading ? t('loading') : t('confirm')}
           </TeleButton>
         )}

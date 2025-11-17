@@ -39,7 +39,7 @@ function App() {
           // style={{
           //   backgroundImage: `url(${Background})`,
           // }}
-          className="min-h-screen bg-cover bg-center">
+          className="">
           <div className="fixed flex flex-row h-50 z-50 w-full">
             <HeaderButtons />
           </div>

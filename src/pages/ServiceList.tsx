@@ -19,6 +19,10 @@ const ServiceList: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const containerRef = useRef<HTMLDivElement>(null);
+  const [selectedServiceId, setSelectedServiceId] = useState<string | null>(
+    null
+  );
+  const [selectedSubService, setSelectedSubService] = useState(null);
 
   const salonId = import.meta.env.VITE_SALON_ID;
   const [code, setCode] = useState();
@@ -55,10 +59,18 @@ const ServiceList: React.FC = () => {
     );
     setFilteredServices(filtered);
   }, [searchQuery, services]);
-
   const handleSelectService = (service: Service) => {
     setService(service);
-    navigate('/additionalservices');
+
+    if (service.subService && service.subService.length > 0) {
+      navigate('/additionalservices', {
+        state: {
+          additionalService: service.subService,
+        },
+      });
+    } else {
+      navigate('/employees');
+    }
   };
 
   if (loading) {
@@ -67,9 +79,9 @@ const ServiceList: React.FC = () => {
 
   return (
     <div className="min-h-screen pb-20 ">
-      <div className="bg-white shadow-sm sticky top-0 z-10">
-        <div className="max-w-4xl mx-auto p-4 bg-transparent">
-          <h1 className="text-2xl font-bold text-gray-800 mb-4">
+      <div className="bg-[#d6a78f] shadow-sm sticky top-0 z-10">
+        <div className="max-w-4xl mx-auto p-4 ">
+          <h1 className="text-2xl font-bold text-white mb-4">
             {t('selectService')}
           </h1>
           <div className="relative">
@@ -88,7 +100,9 @@ const ServiceList: React.FC = () => {
         </div>
       </div>
 
-      <div ref={containerRef} className="max-w-4xl mx-auto p-4 space-y-3">
+      <div
+        ref={containerRef}
+        className="max-w-4xl mx-auto p-4 bg-[#d6a78f] space-y-3">
         {filteredServices.length === 0 ? (
           <div className="text-center py-12 text-gray-500">
             {t('noResults')}
@@ -96,62 +110,88 @@ const ServiceList: React.FC = () => {
         ) : (
           filteredServices
             .filter((service) => service.code === code)
-            .map((service) => (
-              <div
-                key={service._id}
-                onClick={() => handleSelectService(service)}
-                className=" service-card bg-white  rounded-lg shadow-sm p-4 cursor-pointer hover:shadow-md transition-all duration-200 active:scale-98">
-                <h3 className="text-lg font-semibold text-gray-800 mb-2">
-                  {service.name}
-                </h3>
-                {service.description && (
-                  <p className="text-sm text-gray-600 mb-3">
-                    {service.description}
-                  </p>
-                )}
-                {service.serviceFeatures?.length > 0 && (
-                  <div>
-                    <p className="text-xs font-semibold text-gray-800 mb-2">
-                      {' '}
-                      خدمات و متریال مصرفی
-                    </p>
+            .map((service) => {
+              const isVIP = service.serviceType?.toLowerCase() === 'vip';
 
-                    <ul className="text-sm text-gray-600 mb-3 list-disc pr-5 space-y-1">
-                      {service.serviceFeatures.map((feature, index) => (
-                        <li
-                          className="list-image-[url(/src/assets/img/check.png)]"
-                          key={index}>
-                          {feature}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-
-                <div className="flex items-center justify-between text-sm">
-                  <div className="flex items-center gap-1 text-gray-600">
-                    <Clock size={16} />
-                    مدت زمان حدودی:
-                    <span>
-                      {convertToPersianNumber(service.duration)} {t('minutes')}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-1 font-bold text-blue-600 ">
-                    <span>
-                      <span>
-                        {service.price != null
-                          ? convertToPersianNumber(
-                              service.price.toLocaleString()
-                            ) +
-                            ' ' +
-                            t('toman')
-                          : '-'}{' '}
+              return (
+                <div
+                  key={service._id}
+                  onClick={() => handleSelectService(service)}
+                  className={`
+              p-4 border rounded-xl transition shadow-sm
+              ${
+                isVIP
+                  ? 'bg-gradient-to-br from-[#fdf5e6] via-[#fff8dc] to-[#f5e6c4] border-yellow-400 shadow-[0_0_12px_rgba(255,215,0,0.4)]'
+                  : 'bg-gray-50 border-gray-300'
+              }
+            `}
+                  // className=" service-card bg-white  rounded-lg shadow-sm p-4 cursor-pointer hover:shadow-md transition-all duration-200 active:scale-98"
+                >
+                  {' '}
+                  {isVIP && (
+                    <div className="flex items-center gap-1 mb-2">
+                      <span className="text-yellow-600 font-semibold text-sm">
+                        VIP Service
                       </span>
-                    </span>
+                      <span className="text-yellow-600">✨</span>
+                    </div>
+                  )}
+                  {service.type}
+                  <h3
+                    className={`block font-semibold text-lg ${
+                      isVIP ? 'text-yellow-700' : 'text-gray-800'
+                    }`}>
+                    {service.name}
+                  </h3>
+                  {service.description && (
+                    <p className="text-sm text-gray-600 mb-3">
+                      {service.description}
+                    </p>
+                  )}
+                  {service.serviceFeatures?.length > 0 && (
+                    <div>
+                      <p className="text-xs font-semibold text-gray-800 mb-2">
+                        {' '}
+                        خدمات و متریال مصرفی
+                      </p>
+
+                      <ul className="text-sm text-gray-600 mb-3 list-disc pr-5 space-y-1">
+                        {service.serviceFeatures.map((feature, index) => (
+                          <li
+                            className="list-image-[url(/src/assets/img/check.png)]"
+                            key={index}>
+                            {feature}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                  <div className="flex items-center justify-between text-sm">
+                    <div className="flex items-center gap-1 text-gray-600">
+                      <Clock size={16} />
+                      مدت زمان حدودی:
+                      <span>
+                        {convertToPersianNumber(service.duration)}{' '}
+                        {t('minutes')}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1 font-bold text-blue-600 ">
+                      <span>
+                        <span>
+                          {service.price != null
+                            ? convertToPersianNumber(
+                                service.price.toLocaleString()
+                              ) +
+                              ' ' +
+                              t('toman')
+                            : '-'}{' '}
+                        </span>
+                      </span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))
+              );
+            })
         )}
       </div>
     </div>
