@@ -92,30 +92,34 @@ const WeeklyCalendar: React.FC<{
 
   const categories = [
     {
-      name: 'رز | خدمات Basic  تیم Nials By Marjan',
+      title: 'ROSE',
+      name: ' خدمات Basic  تیم Nials By Marjan',
       description:
-        'خدمات رز شامل سرویس Basic است که توسط اعضای تیم Nails By Marjan ارائه می شود.',
+        'خدمات رز شامل سرویس  <strong>BASIC</strong> است که توسط <strong>اعضای تیم</strong> ارائه می شود.',
       type: 'Basic',
       code: 'rose',
     },
     {
+      title: 'LILY',
       name: 'لی لی | خدمات Basic  توسط خانم مرجان ترکمن',
       description:
-        'خدمات لی لی شامل سرویس Basic است که توسط خانم ترکمن ارائه می شود.',
+        'خدمات لی لی شامل سرویس <strong>BASIC</strong> است که توسط <strong>مرجان</strong> ارائه می شود.',
       type: 'Basic',
       code: 'lily',
     },
     {
+      title: 'ORCHID',
       name: 'ارکیده | خدمات VIP  تیم Nials By Marjan',
       description:
-        'خدمات ارکیده شامل سرویس VIP است که توسط اعضای تیم Nails By Marjan ارائه می شود.',
+        'خدمات ارکیده شامل سرویس  <strong>VIP</strong> است که توسط <strong>اعضای تیم</strong> ارائه می شود.',
       type: 'Vip',
       code: 'orchid',
     },
     {
+      title: 'PEONY',
       name: 'پیونی | خدمات VIP  توسط خانم مرجان ترکمن',
       description:
-        'خدمات پیونی شامل سرویس VIP است که توسط خانم مرجان ارائه می شود.',
+        'خدمات پیونی شامل سرویس  <strong>VIP</strong> است که توسط   <strong> مرجان</strong> ارائه می شود.',
       type: 'Vip',
       code: 'peony',
     },
@@ -203,122 +207,139 @@ const WeeklyCalendar: React.FC<{
   return (
     <div className=" space-y-3 flex min-h-screen flex-col items-center justify-center bg-[#d6a78f] p-6 ">
       <Welcome />
-      {week.map((day) => {
-        const disabled = !day.hasWorkingEmployee;
+      {!selectedDay && (
+        <>
+          <span className="flex justify-center text-[#fffffa] font-bold">
+            لطفا تاریخ مورد نظر خود را برای رزرو انتخاب کنید.
+          </span>
+          {week.map((day) => {
+            const disabled = !day.hasWorkingEmployee;
 
-        return (
-          <button
-            key={day.date}
-            disabled={disabled}
-            onClick={() => setSelectedDay(day)} // ⬅ روز انتخاب شده ذخیره می‌شود
-            className={`w-full text-left p-4 rounded-xl border flex justify-between items-center
+            return (
+              <button
+                key={day.date}
+                disabled={disabled}
+                onClick={() => setSelectedDay(day)} // ⬅ روز انتخاب شده ذخیره می‌شود
+                className={`w-full text-left p-4 rounded-xl border flex justify-between items-center
     ${
       disabled
         ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
         : 'bg-white hover:bg-blue-50'
     }
   `}>
-            <span className="font-md">{formatDate(day.date)}</span>
+                <span className="font-md">{formatDate(day.date)}</span>
 
-            {disabled ? (
-              <span className="text-gray-400"> تعطیل</span>
-            ) : day.hasFreeSlot ? (
-              <span className="text-green-600 font-bold"> انتخاب روز</span>
-            ) : (
-              <span className="text-red-500 font-bold">
-                همه وقت‌ها پر هستند
-              </span>
-            )}
-          </button>
-        );
-      })}
+                {disabled ? (
+                  <span className="text-gray-400"> تعطیل</span>
+                ) : day.hasFreeSlot ? (
+                  <span className="text-green-600 font-bold"> انتخاب روز</span>
+                ) : (
+                  <span className="text-red-500 font-bold">
+                    همه وقت‌ها پر هستند
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </>
+      )}
       {selectedDay && (
-        <div className="relative w-full mt-1 p-2 bg-[#d6a78f]  rounded-xl shadow-md border">
-          {/* Top Row: Close Button (Left) + Title (Right) */}
-          <div className="flex items-center justify-between px-2 py-1 absolute top-2 left-0 right-0">
-            {/* Title Text */}
-            <span className="text-gray-100 font-bold text-sm">
-              خدمات قابل ارائه در روز {formatDate(selectedDay.date)}
-            </span>
-            {/* Close Button */}
-            <button
-              onClick={() => handleSelectedDay()}
-              className="p-1 rounded-full hover:bg-gray-100 transition">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="26"
-                height="26"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="text-gray-100">
-                <circle cx="12" cy="12" r="10" />
-                <path d="m15 9-6 6" />
-                <path d="m9 9 6 6" />
-              </svg>
-            </button>
-          </div>
+        <>
+          <span className="text-gray-100 font-bold text-md">
+            خدمات
+            <span className="">"قابل ارائه" </span>
+            در روز {formatDate(selectedDay.date)}
+          </span>
+          <div className="relative w-full mt-1 p-2 bg-[#d6a78f]  rounded-xl shadow-md border">
+            {/* Top Row: Close Button (Left) + Title (Right) */}
+            <div className="flex items-center justify-between px-2 py-1 absolute top-2 left-0 right-0">
+              {/* Title Text */}
+              <span className="text-white font-bold text-sm">
+                تمایل دارید از کدام "شاخه" سرویس دریافت کنید؟
+              </span>
+              {/* Close Button */}
+              <button
+                onClick={() => handleSelectedDay()}
+                className="p-1 rounded-full hover:bg-gray-100 transition">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="26"
+                  height="26"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="text-gray-100">
+                  <circle cx="12" cy="12" r="10" />
+                  <path d="m15 9-6 6" />
+                  <path d="m9 9 6 6" />
+                </svg>
+              </button>
+            </div>
 
-          {/* Add padding so content doesn't overlap top bar */}
-          <div className="pt-12">
-            {selectedDay.employees.length === 0 && (
-              <p className="text-gray-500">
-                هیچ کارمندی برای این روز ثبت نشده است.
-              </p>
-            )}
+            {/* Add padding so content doesn't overlap top bar */}
+            <div className="pt-12">
+              {selectedDay.employees.length === 0 && (
+                <p className="text-gray-500">
+                  هیچ کارمندی برای این روز ثبت نشده است.
+                </p>
+              )}
 
-            <div className="space-y-2">
-              {categories.map((c, idx) => {
-                const isVIP = c.type?.toLowerCase() === 'vip';
+              <div className="space-y-2">
+                {categories.map((c, idx) => {
+                  const isVIP = c.type?.toLowerCase() === 'vip';
 
-                return (
-                  <div
-                    onClick={() => {
-                      navigate('/services', {
-                        state: { code: c.code },
-                      });
-                    }}
-                    key={idx}
-                    className={`
+                  return (
+                    <div
+                      onClick={() => {
+                        navigate('/services', {
+                          state: { code: c.code },
+                        });
+                      }}
+                      key={idx}
+                      className={`
               p-4 border rounded-xl transition shadow-sm
               ${
                 isVIP
-                  ? 'bg-gradient-to-br from-[#fdf5e6] via-[#fff8dc] to-[#f5e6c4] border-yellow-400 shadow-[0_0_12px_rgba(255,215,0,0.4)]'
-                  : 'bg-gray-50 border-gray-300'
+                  ? 'bg-gray-50 border-gray-300'
+                  : // ? 'bg-gradient-to-br from-[#fdf5e6] via-[#fff8dc] to-[#f5e6c4] border-yellow-400 shadow-[0_0_12px_rgba(255,215,0,0.4)]'
+                    'bg-gray-50 border-gray-300'
               }
             `}>
-                    {/* VIP Badge */}
-                    {isVIP && (
-                      <div className="flex items-center gap-1 mb-2">
-                        <span className="text-yellow-600 font-semibold text-sm">
-                          VIP Service
-                        </span>
-                        <span className="text-yellow-600">✨</span>
-                      </div>
-                    )}
+                      {/* VIP Badge */}
+                      {isVIP && (
+                        <div className="flex items-center gap-1 mb-2">
+                          <span className="text-yellow-600 font-semibold text-sm">
+                            VIP Service
+                          </span>
+                          <span className="text-yellow-600">✨</span>
+                        </div>
+                      )}
 
-                    <span
-                      className={`block font-semibold text-lg ${
-                        isVIP ? 'text-yellow-700' : 'text-gray-800'
-                      }`}>
-                      {c.name}
-                    </span>
+                      <span
+                        className={`block font-semibold text-center text-lg ${
+                          isVIP ? 'text-yellow-700' : 'text-yellow-700'
+                        }`}>
+                        {c?.title || c.name}
+                      </span>
 
-                    <p
-                      className={`text-sm mt-1 ${
-                        isVIP ? 'text-yellow-800/90' : 'text-gray-600'
-                      }`}>
-                      {c.description}
-                    </p>
-                  </div>
-                );
-              })}
+                      <p
+                        className={`text-sm text-center mt-1 ${
+                          isVIP ? 'text-yellow-800/90' : 'text-yellow-700'
+                        }`}>
+                        <p
+                          dangerouslySetInnerHTML={{ __html: c.description }}
+                        />
+                      </p>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           </div>
-        </div>
+        </>
       )}
     </div>
   );

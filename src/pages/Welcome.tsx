@@ -92,9 +92,6 @@ const Welcome: React.FC = () => {
             {t('hello', { name: userName })}
           </h1>
         </div>
-        <span className="flex justify-center text-[#fffffa]">
-          لطفا را از لیست زیر برای رزرو نوبت استفاده کنید
-        </span>
       </div>
 
       {/* <div className="static ">
