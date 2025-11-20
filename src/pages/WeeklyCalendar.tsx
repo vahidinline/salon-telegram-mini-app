@@ -97,7 +97,7 @@ const WeeklyCalendar: React.FC<{
       description:
         'خدمات رز شامل سرویس  <strong>BASIC</strong> است که توسط <strong>اعضای تیم</strong> ارائه می شود.',
       type: 'Basic',
-      code: 'rose',
+      code: 'ROSE',
     },
     {
       title: 'LILY',
@@ -105,7 +105,7 @@ const WeeklyCalendar: React.FC<{
       description:
         'خدمات لی لی شامل سرویس <strong>BASIC</strong> است که توسط <strong>مرجان</strong> ارائه می شود.',
       type: 'Basic',
-      code: 'lily',
+      code: 'LILY',
     },
     {
       title: 'ORCHID',
@@ -113,7 +113,7 @@ const WeeklyCalendar: React.FC<{
       description:
         'خدمات ارکیده شامل سرویس  <strong>VIP</strong> است که توسط <strong>اعضای تیم</strong> ارائه می شود.',
       type: 'Vip',
-      code: 'orchid',
+      code: 'ORCHID',
     },
     {
       title: 'PEONY',
@@ -121,7 +121,7 @@ const WeeklyCalendar: React.FC<{
       description:
         'خدمات پیونی شامل سرویس  <strong>VIP</strong> است که توسط   <strong> مرجان</strong> ارائه می شود.',
       type: 'Vip',
-      code: 'peony',
+      code: 'PEONY',
     },
   ];
 
@@ -209,8 +209,10 @@ const WeeklyCalendar: React.FC<{
       <Welcome />
       {!selectedDay && (
         <>
-          <span className="flex justify-center text-[#fffffa] font-bold">
-            لطفا تاریخ مورد نظر خود را برای رزرو انتخاب کنید.
+          <span className="flex text-md justify-center text-[#fffffa] font-bold text-shadow-md">
+            لطفا
+            <span className="text-md font-bold mx-1"> "تاریخ"</span>
+            مورد نظر خود را برای رزرو انتخاب کنید.
           </span>
           {week.map((day) => {
             const disabled = !day.hasWorkingEmployee;
@@ -220,19 +222,34 @@ const WeeklyCalendar: React.FC<{
                 key={day.date}
                 disabled={disabled}
                 onClick={() => setSelectedDay(day)} // ⬅ روز انتخاب شده ذخیره می‌شود
-                className={`w-full text-left p-4 rounded-xl border flex justify-between items-center
+                className={`w-full text-left p-4 rounded-xl border flex justify-between items-center h-8
     ${
       disabled
         ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
         : 'bg-white hover:bg-blue-50'
     }
   `}>
-                <span className="font-md">{formatDate(day.date)}</span>
+                {/* <span className=" text-[#7f3d45] font-bold">
+
+                </span> */}
+
+                {disabled ? (
+                  <span className="text-gray-400"> {formatDate(day.date)}</span>
+                ) : day.hasFreeSlot ? (
+                  <span className="text-[#7f3d45] font-bold">
+                    {' '}
+                    {formatDate(day.date)}
+                  </span>
+                ) : (
+                  <span className="text-red-500 font-bold">
+                    {formatDate(day.date)}
+                  </span>
+                )}
 
                 {disabled ? (
                   <span className="text-gray-400"> تعطیل</span>
                 ) : day.hasFreeSlot ? (
-                  <span className="text-green-600 font-bold"> انتخاب روز</span>
+                  <span className="text-[#7f3d45] font-bold"> انتخاب روز</span>
                 ) : (
                   <span className="text-red-500 font-bold">
                     همه وقت‌ها پر هستند
@@ -245,18 +262,22 @@ const WeeklyCalendar: React.FC<{
       )}
       {selectedDay && (
         <>
-          <span className="text-gray-100 font-bold text-md">
-            خدمات
-            <span className="">"قابل ارائه" </span>
-            در روز {formatDate(selectedDay.date)}
-          </span>
-          <div className="relative w-full mt-1 p-2 bg-[#d6a78f]  rounded-xl shadow-md border">
+          <div className="h-16 text-center">
+            <span className="text-white font-bold text-md">
+              تمایل دارید از کدام "شاخه" سرویس دریافت کنید؟
+            </span>
+            <span className="text-gray-100 font-bold text-sm ">
+              <span>(</span>
+              خدمات <span className=" text-sm">"قابل ارائه" </span>
+              در روز {formatDate(selectedDay.date)}
+            </span>
+            <span className="text-white">)</span>
+          </div>
+          <div className="relative w-full p-2 bg-[#d6a78f]  rounded-xl shadow-md border">
             {/* Top Row: Close Button (Left) + Title (Right) */}
             <div className="flex items-center justify-between px-2 py-1 absolute top-2 left-0 right-0">
               {/* Title Text */}
-              <span className="text-white font-bold text-sm">
-                تمایل دارید از کدام "شاخه" سرویس دریافت کنید؟
-              </span>
+
               {/* Close Button */}
               <button
                 onClick={() => handleSelectedDay()}

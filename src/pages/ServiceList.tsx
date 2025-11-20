@@ -83,8 +83,8 @@ const ServiceList: React.FC = () => {
     <div className="min-h-screen pb-20 ">
       <div className="bg-[#d6a78f] shadow-sm sticky top-0 z-10">
         <div className="max-w-4xl mx-auto p-4 ">
-          <h1 className="text-2xl font-bold text-white mb-4">
-            {t('selectService')}
+          <h1 className="text-lg font-bold text-white mb-4">
+            سرویس خود را از شاخه {code} انتخاب کنید
           </h1>
           <div className="relative">
             <Search
@@ -111,7 +111,7 @@ const ServiceList: React.FC = () => {
           </div>
         ) : (
           filteredServices
-            .filter((service) => service.code === code)
+            .filter((service) => service.code === code.toLowerCase())
             .map((service) => {
               const isVIP = service.serviceType?.toLowerCase() === 'vip';
 
@@ -122,7 +122,7 @@ const ServiceList: React.FC = () => {
               p-4 border rounded-xl transition shadow-sm
               ${
                 isVIP
-                  ? 'bg-gradient-to-br from-[#fdf5e6] via-[#fff8dc] to-[#f5e6c4] border-yellow-400 shadow-[0_0_12px_rgba(255,215,0,0.4)]'
+                  ? 'bg-gray-50 border-gray-300'
                   : 'bg-gray-50 border-gray-300'
               }
             `}
@@ -167,7 +167,7 @@ const ServiceList: React.FC = () => {
                     </div>
                     <div className="flex items-center gap-1 font-bold text-blue-600 ">
                       <span>
-                        <span>
+                        <span className="text-[#7f3d45] text-lg">
                           {service.price != null
                             ? convertToPersianNumber(
                                 service.price.toLocaleString()
@@ -180,14 +180,14 @@ const ServiceList: React.FC = () => {
                     </div>
                   </div>
                   <div>
-                    <TeleButton
+                    <button
                       onClick={() => handleSelectService(service)}
-                      className="w-full mt-4 bg-[#8d98d6] ">
-                      <span className="text-white font-bold">
+                      className="w-full mt-4 bg-[#7f3d45] rounded rounded-lg h-10 ">
+                      <span className="text-white font-bold ">
                         {' '}
                         {t('selectService')}
                       </span>
-                    </TeleButton>
+                    </button>
                   </div>
                 </div>
               );
