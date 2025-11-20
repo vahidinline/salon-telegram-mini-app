@@ -8,13 +8,14 @@ const LoadingSpinner: React.FC = () => {
     //   <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
     // </div>
     <div
+      className="h-screen"
       style={{
         // height: '100%',
         // width: '100%',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        //backgroundColor: '#fffffa', // or Telegram theme background
+        backgroundColor: '#d6a78d', // or Telegram theme background
       }}>
       <Lottie
         animationData={Loading}

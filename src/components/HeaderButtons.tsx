@@ -31,19 +31,19 @@ const HeaderButtons: React.FC = () => {
       )}
 
       {onRoot && (
-        <div className="flex flex-row items-center justify-between w-full px-2">
+        <div className="flex flex-row items-center justify-between w-full p-2 ">
           {/* Left Button */}
           <button
             onClick={() => navigate('/bookings')}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-100 text-gray-800 hover:bg-gray-200 text-base font-medium transition">
+            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#fffffa] text-[#8d98d6] hover:bg-gray-200 text-base font-medium transition">
             {t('bookingHistory')}
           </button>
 
           {/* Right Home Button */}
           <button
             onClick={() => navigate('/')}
-            className="flex items-center gap-2 px-3 py-2 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition">
-            <Home className="w-5 h-5" />
+            className="flex items-center gap-2 px-3 py-2 rounded-lg bg-[] text-gray-700 hover:bg-gray-200 transition">
+            <Home className="w-5 h-5" color="white" />
           </button>
         </div>
       )}

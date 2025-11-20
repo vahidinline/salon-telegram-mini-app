@@ -2,7 +2,7 @@ import React, { useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { getTelegramUser } from '../utils/telegram';
-import Logo from '../assets/img/logo.png';
+import Logo from '../assets/img/logo02.png';
 import gsap from 'gsap';
 import { usePrefersReducedMotion } from '../hooks/useAnimations';
 import { useTelegramStore } from '../store/useTelegramStore';
@@ -84,14 +84,17 @@ const Welcome: React.FC = () => {
       ref={containerRef}
       className=" flex flex-col items-center max-h-screen justify-center bg-[#d6a78f] p-2 overflow-auto">
       <div className="max-w-md w-full  space-y-8">
-        <span className="flex justify-center   p-5">
+        <span className="flex justify-center ">
           <img src={Logo} alt="App Logo" className="h-15 w-full" />
         </span>
         <div className="text-center">
-          <h1 className="welcome-title text-4xl font-bold text-gray-100 mb-4">
+          <h1 className="welcome-title text-2xl font-bold text-gray-100 mb-4">
             {t('hello', { name: userName })}
           </h1>
         </div>
+        <span className="flex justify-center text-[#fffffa]">
+          لطفا را از لیست زیر برای رزرو نوبت استفاده کنید
+        </span>
       </div>
 
       {/* <div className="static ">

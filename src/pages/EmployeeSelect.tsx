@@ -102,7 +102,7 @@ const EmployeeSelect: React.FC = () => {
                       <img
                         src={employee.avatar}
                         alt={employee.name}
-                        className="w-full h-full rounded-full object-cover"
+                        className="w-full h-full bg-gray-300 rounded-xl object-cover"
                       />
                     ) : (
                       <User size={32} />
@@ -114,7 +114,7 @@ const EmployeeSelect: React.FC = () => {
                 </div>
                 <div className="flex-1">
                   {/* ✅ Display work schedule dynamically */}
-                  <div className="mt-2 space-y-1 text-sm text-gray-600">
+                  {/* <div className="mt-2 space-y-1 text-sm text-gray-600">
                     {employee.workSchedule &&
                     employee.workSchedule.length > 0 ? (
                       employee.workSchedule.map((dayItem, idx) => (
@@ -133,12 +133,14 @@ const EmployeeSelect: React.FC = () => {
                         {t('noScheduleAvailable')}
                       </span>
                     )}
+                  </div> */}
+                  <div className="mt-4 flex justify-end w-full">
+                    <button
+                      onClick={() => handleSelectEmployee(employee)}
+                      className=" text-md bg-[#8d98d6] hover:bg-[#c5947e] text-white  py-2 px-4 rounded-lg shadow-sm">
+                      {t('selectEmployee')}
+                    </button>
                   </div>
-                  <TeleButton
-                    onClick={() => handleSelectEmployee(employee)}
-                    className=" text-xs">
-                    {t('selectEmployee')}
-                  </TeleButton>
                 </div>
               </div>
             </div>

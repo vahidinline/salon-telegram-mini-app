@@ -164,9 +164,12 @@ const FileUpload: React.FC<FileUploadProps> = ({
   return (
     <div className="space-y-4">
       {label && (
-        <label className="block text-sm font-medium text-gray-700">
-          {label}
-        </label>
+        <>
+          <div className="border-t border-gray-200 my-2"></div>
+          <label className="block text-sm font-bold text-gray-100 mt-2">
+            {label}
+          </label>
+        </>
       )}
 
       <div className="flex gap-3">
@@ -174,18 +177,18 @@ const FileUpload: React.FC<FileUploadProps> = ({
           type="button"
           onClick={() => fileInputRef.current?.click()}
           className="flex-1 flex flex-col items-center justify-center gap-2 p-6 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-400 hover:bg-blue-50 transition-all duration-200 active:scale-98">
-          <Upload size={32} className="text-gray-400" />
-          <span className="text-sm font-medium text-gray-600">انتخاب فایل</span>
-          <span className="text-xs text-gray-500">آپلود رسید</span>
+          <Upload size={32} className="text-gray-100" />
+          <span className="text-sm font-medium text-gray-100">انتخاب فایل</span>
+          <span className="text-xs text-gray-100">آپلود رسید</span>
         </button>
 
         <button
           type="button"
           onClick={() => cameraInputRef.current?.click()}
           className="flex-1 flex flex-col items-center justify-center gap-2 p-6 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-400 hover:bg-blue-50 transition-all duration-200 active:scale-98">
-          <Camera size={32} className="text-gray-400" />
-          <span className="text-sm font-medium text-gray-600">دوربین</span>
-          <span className="text-xs text-gray-500">
+          <Camera size={32} className="text-gray-100" />
+          <span className="text-sm font-medium text-gray-100">دوربین</span>
+          <span className="text-xs text-gray-100">
             از رسید پرداخت عکس بگیرید
           </span>
         </button>
@@ -272,18 +275,18 @@ const FileUpload: React.FC<FileUploadProps> = ({
                           style={{ width: `${uploadedFile.progress}%` }}
                         />
                       </div>
-                      <p className="text-xs text-gray-500">
+                      <p className="text-xs text-gray-100">
                         {t('uploading')} {uploadedFile.progress}%
                       </p>
                     </div>
                   )}
 
                   {uploadedFile.status === 'error' && uploadedFile.error && (
-                    <p className="text-xs text-red-600">{uploadedFile.error}</p>
+                    <p className="text-xs text-red-400">{uploadedFile.error}</p>
                   )}
 
                   {uploadedFile.status === 'success' && uploadedFile.url && (
-                    <p className="text-xs text-gray-500 truncate">
+                    <p className="text-xs text-gray-100 truncate">
                       {uploadedFile.url}
                     </p>
                   )}
@@ -294,7 +297,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
         </div>
       )}
 
-      <p className="text-xs text-gray-500">
+      <p className="text-xs text-gray-200">
         فرمت های مجاز : JPG, PNG, PDF حداکثر حجم : {maxSizeMB}MB)
       </p>
     </div>

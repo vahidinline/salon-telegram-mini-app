@@ -9,6 +9,8 @@ import LoadingSpinner from '../components/LoadingSpinner';
 import { showTelegramAlert } from '../utils/telegram';
 import { useStaggerAnimation } from '../hooks/useAnimations';
 import { convertToPersianNumber } from '../utils/NumberFarsi';
+import ServiceFeaturesAccordion from '../components/Accrodion';
+import TeleButton from '../components/TeleButton';
 
 const ServiceList: React.FC = () => {
   const { t } = useTranslation();
@@ -116,7 +118,6 @@ const ServiceList: React.FC = () => {
               return (
                 <div
                   key={service._id}
-                  onClick={() => handleSelectService(service)}
                   className={`
               p-4 border rounded-xl transition shadow-sm
               ${
@@ -128,12 +129,18 @@ const ServiceList: React.FC = () => {
                   // className=" service-card bg-white  rounded-lg shadow-sm p-4 cursor-pointer hover:shadow-md transition-all duration-200 active:scale-98"
                 >
                   {' '}
-                  {isVIP && (
+                  {isVIP ? (
                     <div className="flex items-center gap-1 mb-2">
                       <span className="text-yellow-600 font-semibold text-sm">
                         VIP Service
                       </span>
                       <span className="text-yellow-600">✨</span>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-1 mb-2">
+                      <span className="text-[#C0C0C0] font-semibold text-sm">
+                        BASIC Service
+                      </span>
                     </div>
                   )}
                   {service.type}
@@ -148,24 +155,7 @@ const ServiceList: React.FC = () => {
                       {service.description}
                     </p>
                   )}
-                  {service.serviceFeatures?.length > 0 && (
-                    <div>
-                      <p className="text-xs font-semibold text-gray-800 mb-2">
-                        {' '}
-                        خدمات و متریال مصرفی
-                      </p>
-
-                      <ul className="text-sm text-gray-600 mb-3 list-disc pr-5 space-y-1">
-                        {service.serviceFeatures.map((feature, index) => (
-                          <li
-                            className="list-image-[url(/src/assets/img/check.png)]"
-                            key={index}>
-                            {feature}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
+                  <ServiceFeaturesAccordion service={service} />
                   <div className="flex items-center justify-between text-sm">
                     <div className="flex items-center gap-1 text-gray-600">
                       <Clock size={16} />
@@ -188,6 +178,16 @@ const ServiceList: React.FC = () => {
                         </span>
                       </span>
                     </div>
+                  </div>
+                  <div>
+                    <TeleButton
+                      onClick={() => handleSelectService(service)}
+                      className="w-full mt-4 bg-[#8d98d6] ">
+                      <span className="text-white font-bold">
+                        {' '}
+                        {t('selectService')}
+                      </span>
+                    </TeleButton>
                   </div>
                 </div>
               );

@@ -218,10 +218,10 @@ const WeeklyCalendar: React.FC<{
         : 'bg-white hover:bg-blue-50'
     }
   `}>
-            <span className="font-semibold">{formatDate(day.date)}</span>
+            <span className="font-md">{formatDate(day.date)}</span>
 
             {disabled ? (
-              <span className="text-gray-400">روز تعطیل</span>
+              <span className="text-gray-400"> تعطیل</span>
             ) : day.hasFreeSlot ? (
               <span className="text-green-600 font-bold"> انتخاب روز</span>
             ) : (

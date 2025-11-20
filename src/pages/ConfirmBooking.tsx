@@ -35,7 +35,10 @@ const ConfirmBooking: React.FC = () => {
   const [recipientName, setRecipientName] = useState('');
   let gregorianDob = null;
   if (dob) {
-    gregorianDob = dayjs.from(dob, { jalali: true }).format('YYYY-MM-DD');
+    gregorianDob = dayjs(dob, 'YYYY/MM/DD')
+      .calendar('jalali')
+      .calendar('gregory')
+      .format('YYYY-MM-DD');
   }
 
   // ✅ Redirect if required data is missing
@@ -208,7 +211,7 @@ const ConfirmBooking: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#d6a78f] pb-28 bg-gray-50">
+    <div className="min-h-screen bg-[#d6a78f] pb-28 ">
       {/* Header */}
       <div className=" shadow-md sticky top-0 z-20">
         <div className="max-w-4xl mx-auto p-4">

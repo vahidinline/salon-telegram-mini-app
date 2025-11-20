@@ -195,7 +195,7 @@ const CalendarSlots: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen pb-20">
+    <div className="max-h-screen pb-20">
       <div className="bg-[#d6a78f] shadow-sm sticky top-0 z-10">
         <div className="max-w-4xl mx-auto p-4">
           <h1 className="text-2xl font-bold text-white mb-2">
@@ -220,7 +220,7 @@ const CalendarSlots: React.FC = () => {
             {t('selectDate')}
           </h2>
           <div className="overflow-x-auto pb-2">
-            <div className="grid grid-cols-4 gap-2  min-w-max">
+            <div className="flex gap-2  min-w-max">
               {calendar.map((date, index) => {
                 const isSelected = dayjs(date).isSame(selectedDate, 'day');
                 return (
@@ -291,11 +291,13 @@ const CalendarSlots: React.FC = () => {
         </div>
 
         {selectedSlot && (
-          <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4">
-            <div className="max-w-4xl mx-auto">
-              <TeleButton onClick={handleContinue} className="w-full">
+          <div className="fixed bottom-5 left-0 right-0 h-10 border-gray-200 p-4">
+            <div className="max-w-4xl mx-auto ">
+              <button
+                onClick={handleContinue}
+                className="w-full bg-[#8d98d6] text-white py-2 rounded-lg font-semibold shadow-md hover:bg-[#7a85c2] transition-colors">
                 {t('next')}
-              </TeleButton>
+              </button>
             </div>
           </div>
         )}
