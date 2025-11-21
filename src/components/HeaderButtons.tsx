@@ -35,7 +35,7 @@ const HeaderButtons: React.FC = () => {
           {/* Left Button */}
           <button
             onClick={() => navigate('/bookings')}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#fffffa] text-[#8d98d6] hover:bg-gray-200 text-base font-medium transition">
+            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#fffffa] text-[#7f3d45] hover:bg-gray-200 text-sm  font-bold transition">
             {t('bookingHistory')}
           </button>
 

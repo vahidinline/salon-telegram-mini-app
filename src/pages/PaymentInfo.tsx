@@ -77,9 +77,13 @@ function PaymentInfo() {
 
   return (
     <div className="min-h-screen pb-20 bg-[#d6a78f]">
-      <div className="bg-white shadow-sm">
+      <div className=" shadow-sm">
         <div className="max-w-4xl mx-auto p-4">
-          <h1 className="text-2xl font-bold text-gray-800">اطلاعات پرداخت</h1>
+          <h1 className="text-base  text-white">
+            لطفا
+            <span className="font-bold"> "بیعانه" </span>
+            خود را پرداخت کنید.
+          </h1>
         </div>
       </div>
 
@@ -99,6 +103,10 @@ function PaymentInfo() {
               <span className="font-medium">مرجان</span>
             </div>
 
+            <div className="flex justify-between">
+              <span className="text-gray-600">مبلغ قابل پرداخت </span>
+              <span className="font-medium">۲۰۰،۰۰۰ تومان</span>
+            </div>
             {/* <div className="flex justify-between">
               <span className="text-gray-600">شماره تماس</span>
               <span className="font-medium">{booking.clientPhone}</span>
@@ -109,7 +117,7 @@ function PaymentInfo() {
               <span
                 className={`font-medium ${
                   booking.status === 'pending'
-                    ? 'text-blue-600'
+                    ? 'text-[#7f3d45]'
                     : booking.status === 'review'
                     ? 'text-yellow-600'
                     : booking.status === 'confirmed'
@@ -186,20 +194,19 @@ function PaymentInfo() {
         )}
       </div>
 
-      <div className="fixed flex justify-between bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4">
-        <TeleButton
+      <div className="fixed flex justify-between bottom-0 left-0 right-0 bg-[#d6a78f] border-t border-gray-200 p-4">
+        <button
           onClick={() => navigate('/')}
-          variant="alert"
-          className=" flex items-center justify-center gap-2">
+          className="w-full bg-[#7f3d45] h-12 rounded-md text-white flex items-center justify-center gap-2">
           برگشت به خانه
-        </TeleButton>
+        </button>
 
-        <TeleButton
+        {/* <TeleButton
           onClick={() => navigate('/bookings')}
           variant="primary"
           className=" flex items-center justify-center gap-2">
           مدیریت رزروها
-        </TeleButton>
+        </TeleButton> */}
       </div>
     </div>
   );

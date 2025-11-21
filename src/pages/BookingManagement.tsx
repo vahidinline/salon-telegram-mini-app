@@ -176,17 +176,18 @@ const BookingManagement: React.FC = () => {
     cancelStatusLabels[booking.cancelationReason] || booking.cancelationReason;
 
   return (
-    <div className="min-h-screen pb-20">
-      <div className="bg-white shadow-sm sticky top-0 z-10">
+    <div className="min-h-screen pb-20 bg-[#d6a78f]">
+      <div className=" shadow-sm sticky top-0 z-10">
         <div className="max-w-4xl mx-auto p-4">
-          <h1 className="text-2xl font-bold mt-15 text-gray-800">
-            مدیریت رزرو
+          <h1 className="text-base  text-white">
+            مدیریت
+            <span className="font-bold"> "رزرو" </span>
           </h1>
         </div>
       </div>
 
       <div ref={containerRef} className="max-w-4xl mx-auto p-4 space-y-3">
-        <div className="booking-card bg-white rounded-lg shadow-sm p-4">
+        <div className="booking-card rounded-lg shadow-sm p-4">
           <div className="flex items-start justify-between mb-3">
             <h3 className="text-lg font-semibold text-gray-800">
               {typeof service === 'object' ? service.name : 'سرویس انتخابی'}

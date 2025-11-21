@@ -11,6 +11,7 @@ import TeleButton from '../components/TeleButton';
 import 'dayjs/locale/fa';
 import { convertToPersianNumber } from '../utils/NumberFarsi';
 import api from '../utils/api';
+import JalaliMonthlyCalendar from '../components/MonthlyCal';
 
 dayjs.extend(jalaliday);
 
@@ -33,7 +34,7 @@ const CalendarSlots: React.FC = () => {
   );
   useEffect(() => {
     if (!bookingState.service || !bookingState.employee) {
-      navigate('/services');
+      navigate('/');
       return;
     }
     generateCalendar();
@@ -198,16 +199,19 @@ const CalendarSlots: React.FC = () => {
     <div className="max-h-screen pb-20">
       <div className="bg-[#d6a78f] shadow-sm sticky top-0 z-10">
         <div className="max-w-4xl mx-auto p-4">
-          <h1 className="text-2xl font-bold text-white mb-2">
-            {t('selectDateTime')}
+          <h1 className="text-md  text-white mb-2">
+            لطفا
+            <span className="font-bold">" تاریخ و ساعت "</span>
+            خود را انتخاب کنید.
           </h1>
-          <div className="text-sm text-gray-100 space-y-1">
+          <div className="border-t border-[#7f3d45] my-2"></div>
+          <div className="text-sm text-[#7f3d45] space-y-1">
             <p>
-              {t('service')}:{' '}
+              {t('service')} انتخابی شما :{' '}
               <span className="font-medium">{bookingState.service?.name}</span>
             </p>
             <p>
-              {t('employee')}:{' '}
+              {t('employee')} انتخابی شما :{' '}
               <span className="font-medium">{bookingState.employee?.name}</span>
             </p>
           </div>
@@ -220,7 +224,19 @@ const CalendarSlots: React.FC = () => {
             {t('selectDate')}
           </h2>
           <div className="overflow-x-auto pb-2">
-            <div className="flex gap-2  min-w-max">
+            <JalaliMonthlyCalendar
+              selectedDate={selectedDate}
+              onSelectDate={setSelectedDate}
+            />
+
+            {/* <div className="mt-4 text-center">
+              تاریخ انتخاب‌شده:
+              {selectedDate
+                .locale('fa')
+                .calendar('jalali')
+                .format('YYYY/MM/DD')}
+            </div> */}
+            {/* <div className="grid grid-cols-4 gap-2  min-w-max">
               {calendar.map((date, index) => {
                 const isSelected = dayjs(date).isSame(selectedDate, 'day');
                 return (
@@ -231,7 +247,7 @@ const CalendarSlots: React.FC = () => {
                       flex flex-col items-center justify-center w-20 h-24 rounded-lg border-2 transition-all duration-200
                       ${
                         isSelected
-                          ? 'border-blue-500 bg-blue-50 text-blue-700'
+                          ? 'border-[#7f3d45] bg-blue-50 text-[#7f3d45]'
                           : 'border-gray-200 bg-white hover:border-blue-300'
                       }
                     `}>
@@ -247,7 +263,7 @@ const CalendarSlots: React.FC = () => {
                   </button>
                 );
               })}
-            </div>
+            </div> */}
           </div>
         </div>
 
@@ -262,7 +278,7 @@ const CalendarSlots: React.FC = () => {
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="h-12 w-12 mb-3 text-gray-400"
-                fill="none"
+                fill="white"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
                 strokeWidth={1.5}>
@@ -272,8 +288,8 @@ const CalendarSlots: React.FC = () => {
                   d="M8 7V3m8 4V3m-9 8h10m-9 4h8m-10 4h12a2 2 0 002-2V7a2 2 0 00-2-2h-3V3m-6 2H6a2 2 0 00-2 2v10a2 2 0 002 2z"
                 />
               </svg>
-              <p className="text-sm font-medium text-gray-500">
-                هیچ زمان آزادی برای این روز وجود ندارد
+              <p className="text-sm font-medium text-white">
+                زمان آزادی برای این روز وجود ندارد
               </p>
             </div>
           ) : (
@@ -291,11 +307,11 @@ const CalendarSlots: React.FC = () => {
         </div>
 
         {selectedSlot && (
-          <div className="fixed bottom-5 left-0 right-0 h-10 border-gray-200 p-4">
+          <div className=" top-0 left-0 right-0 h-10 border-gray-200 p-4">
             <div className="max-w-4xl mx-auto ">
               <button
                 onClick={handleContinue}
-                className="w-full bg-[#8d98d6] text-white py-2 rounded-lg font-semibold shadow-md hover:bg-[#7a85c2] transition-colors">
+                className="w-full bg-[#7f3d45] text-white py-2 rounded-lg font-semibold shadow-md hover:bg-[#7a85c2] transition-colors">
                 {t('next')}
               </button>
             </div>

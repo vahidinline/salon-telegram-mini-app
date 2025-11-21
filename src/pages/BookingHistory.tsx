@@ -101,11 +101,12 @@ const BookingHistory: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen  pb-20">
-      <div className="bg-white shadow-sm sticky top-0 z-10">
+    <div className="min-h-screen bg-[#d6a78f]  pb-20">
+      <div className=" shadow-sm sticky top-0 z-10">
         <div className="max-w-4xl mx-auto p-4">
-          <h1 className="text-2xl font-bold mt-15 text-gray-800">
-            {t('bookingHistory')}
+          <h1 className="text-base  text-white">
+            <span className="font-bold"> "رزرو های" </span>
+            خود را مدیریت کنید.
           </h1>
         </div>
       </div>
@@ -142,9 +143,9 @@ const BookingHistory: React.FC = () => {
             return (
               <div
                 key={booking._id}
-                className="booking-card bg-white rounded-lg shadow-sm p-4">
+                className="booking-card bg-white rounded-lg shadow-sm p-4  border border-gray-200">
                 <div className="flex items-start justify-between mb-3">
-                  <h3 className="text-lg font-semibold text-gray-800">
+                  <h3 className="text-lg font-semibold text-[#7f3d45]">
                     {service}
                   </h3>
                   <span
@@ -159,7 +160,7 @@ const BookingHistory: React.FC = () => {
                 <div className="space-y-2 text-sm text-gray-600 mb-4">
                   <div className="flex items-center gap-2">
                     <User size={16} />
-                    <span>
+                    <span className="text-[#7f3d45]">
                       {/* {typeof employee === 'object' ? employee.name : 'مریم'} */}
                       {employee}
                     </span>
@@ -206,17 +207,16 @@ const BookingHistory: React.FC = () => {
                     )}
                   </TeleButton> */}
 
-                  <TeleButton
+                  <button
                     onClick={() =>
                       navigate('/bookingmanagement', {
                         state: { bookingId: booking._id },
                       })
                     }
-                    variant="primary"
-                    className="w-full flex items-center justify-center gap-2">
+                    className="w-full bg-[#7f3d45] h-12 rounded-md text-white flex items-center justify-center gap-2">
                     <XCircle size={18} />
                     {t('manageBooking')}
-                  </TeleButton>
+                  </button>
                 </div>
               </div>
             );

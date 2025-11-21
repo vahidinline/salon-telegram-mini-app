@@ -83,8 +83,9 @@ const ServiceList: React.FC = () => {
     <div className="min-h-screen pb-20 ">
       <div className="bg-[#d6a78f] shadow-sm sticky top-0 z-10">
         <div className="max-w-4xl mx-auto p-4 ">
-          <h1 className="text-lg font-bold text-white mb-4">
-            سرویس خود را از شاخه {code} انتخاب کنید
+          <h1 className="text-base  text-white mb-4">
+            لطفا سرویس خود را از{' '}
+            <span className="font-bold">"شاخه {code}"</span> انتخاب کنید.
           </h1>
           <div className="relative">
             <Search

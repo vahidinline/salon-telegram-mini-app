@@ -43,7 +43,7 @@ const PaymentCountdown: React.FC<PaymentCountdownProps> = ({
   const seconds = dur.seconds();
 
   return (
-    <span className="font-medium text-green-600 text-sm">
+    <span className="font-medium text-[#7f3d45] text-sm">
       {`${minutes.toString().padStart(2, '0')}:${seconds
         .toString()
         .padStart(2, '0')} تا پایان`}

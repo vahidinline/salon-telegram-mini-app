@@ -9,7 +9,7 @@ import LoadingSpinner from '../components/LoadingSpinner';
 import TeleButton from '../components/TeleButton';
 import { showTelegramAlert } from '../utils/telegram';
 import { useStaggerAnimation } from '../hooks/useAnimations';
-
+import Marjan from '../assets/img/marjan.png';
 const EmployeeSelect: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -70,14 +70,16 @@ const EmployeeSelect: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen pb-20">
+    <div className="h-screen pb-20 bg-[#d6a78f]">
       <div className="bg-[#d6a78f] shadow-sm sticky top-0 z-10">
         <div className="max-w-4xl mx-auto p-4">
-          <h1 className="text-2xl font-bold text-gray-100 mb-2">
-            {t('selectEmployee')}
+          <h1 className="text-base text-gray-100 mb-2">
+            لطفا <span className="font-bold">"Nail Artist" </span> خود را انتخاب
+            کنید.
           </h1>
-          <p className="text-sm text-gray-200">
-            {t('service')}:{' '}
+          <div className="border-t border-[#7f3d45] my-2"></div>
+          <p className="text-xs text-[#7f3d45]">
+            سرویس انتخابی شما :{' '}
             <span className="font-medium">{bookingState.service?.name}</span>
           </p>
         </div>
@@ -93,24 +95,28 @@ const EmployeeSelect: React.FC = () => {
         ) : (
           employees.map((employee) => (
             <div
+              style={{
+                height: '150px',
+              }}
               key={employee._id}
-              className="employee-card bg-[#fffffa] rounded-lg shadow-sm p-4">
+              className="employee-card bg-gray-100/50 rounded-lg shadow-sm p-4 flex flex-row justify-between ">
               <div className="flex  items-start gap-4 mb-4">
-                <div className="flex flex-col">
-                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-400 to-cyan-500 flex items-center justify-center text-white">
+                <div className="flex flex-col w-1/3">
+                  <div className="w-32 h-32 rounded-full  flex items-center justify-center text-white opacity-100">
                     {employee.avatar ? (
                       <img
-                        src={employee.avatar}
+                        src={Marjan}
+                        alt={employee.name}
+                        className="w-full h-full  rounded-xl object-contain"
+                      />
+                    ) : (
+                      <img
+                        src={Marjan}
                         alt={employee.name}
                         className="w-full h-full bg-gray-300 rounded-xl object-cover"
                       />
-                    ) : (
-                      <User size={32} />
                     )}
                   </div>
-                  <h3 className="text-md text-center mt-2 font-semibold text-gray-800">
-                    {employee.name}
-                  </h3>
                 </div>
                 <div className="flex-1">
                   {/* ✅ Display work schedule dynamically */}
@@ -134,13 +140,19 @@ const EmployeeSelect: React.FC = () => {
                       </span>
                     )}
                   </div> */}
-                  <div className="mt-4 flex justify-end w-full">
-                    <button
-                      onClick={() => handleSelectEmployee(employee)}
-                      className=" text-md bg-[#8d98d6] hover:bg-[#c5947e] text-white  py-2 px-4 rounded-lg shadow-sm">
-                      {t('selectEmployee')}
-                    </button>
-                  </div>
+                </div>
+              </div>
+              <div className="w-2/3">
+                <h3 className="text-md text-center mt-2 font-semibold text-gray-800"></h3>
+                <div className="mt-4 flex justify-end w-full">
+                  <button
+                    onClick={() => handleSelectEmployee(employee)}
+                    className=" text-sm bg-[#7f3d45] hover:bg-[#c5947e] text-white  py-2 px-4 rounded-lg shadow-sm">
+                    از <span className="font-bold">{employee.name}</span>
+                    <br />
+                    سرویس دریافت میکنم.
+                    {/* {employee.name} را انتخاب میکنم */}
+                  </button>
                 </div>
               </div>
             </div>

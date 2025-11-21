@@ -27,7 +27,7 @@ const SlotCard: React.FC<SlotCardProps> = ({
         px-4 py-3 rounded-lg border-2 transition-all duration-200 flex flex-row font-bold
         ${
           selected
-            ? 'border-blue-500 bg-blue-50 text-blue-700'
+            ? 'border-[#7f3d45] bg-blue-50 text-[#7f3d45]'
             : 'border-gray-200 bg-white hover:border-blue-300 hover:bg-blue-50'
         }
         ${
