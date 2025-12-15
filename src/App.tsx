@@ -7,13 +7,12 @@ import {
 } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { BookingProvider } from './context/BookingContext';
-import Welcome from './pages/Welcome';
 import ServiceList from './pages/ServiceList';
 import EmployeeSelect from './pages/EmployeeSelect';
 import CalendarSlots from './pages/CalendarSlots';
 import ConfirmBooking from './pages/ConfirmBooking';
 import BookingHistory from './pages/BookingHistory';
-import { initTelegramWebApp } from './utils/telegram';
+import { getTelegramUser, initTelegramWebApp } from './utils/telegram';
 import PaymentInfo from './pages/PaymentInfo';
 import HeaderButtons from './components/HeaderButtons';
 import BookingManagement from './pages/BookingManagement';
@@ -25,6 +24,11 @@ function App() {
 
   useEffect(() => {
     initTelegramWebApp();
+
+    const user = getTelegramUser();
+    if (user) {
+      localStorage.setItem('telegramUser', JSON.stringify(user));
+    }
 
     const savedLang = localStorage.getItem('language') || 'fa';
     i18n.changeLanguage(savedLang);

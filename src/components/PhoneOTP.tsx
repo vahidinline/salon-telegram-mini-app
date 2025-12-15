@@ -87,7 +87,7 @@ const PhoneOTP: React.FC<PhoneOTPProps> = ({ onVerified, telegramUserId }) => {
       {step === 'phone' ? (
         <>
           <div>
-            <label className="block text-sm font-medium mb-2">
+            <label className="block text-sm font-medium text-[#7f3d45] mb-2">
               {t('phone')}
             </label>
             <input
@@ -95,16 +95,16 @@ const PhoneOTP: React.FC<PhoneOTPProps> = ({ onVerified, telegramUserId }) => {
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               placeholder="09123456789"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-3 border border-[#7f3d45] rounded-lg focus:ring-2 focus:ring-[#7f3d45] focus:border-[#7f3d45]"
               dir="ltr"
             />
           </div>
-          <TeleButton
+          <button
             onClick={handleSendOTP}
             disabled={loading || !phone}
-            className="w-full">
+            className="w-full bg-[#7f3d45] text-white px-4 py-3 rounded-lg hover:bg-[#6e343c] disabled:opacity-50">
             {loading ? t('loading') : t('sendOTP')}
-          </TeleButton>
+          </button>
         </>
       ) : (
         <>
@@ -123,12 +123,12 @@ const PhoneOTP: React.FC<PhoneOTPProps> = ({ onVerified, telegramUserId }) => {
             />
             <p className="text-sm text-gray-500 mt-2">{t('enterOTP')}</p>
           </div>
-          <TeleButton
+          <button
             onClick={handleVerifyOTP}
             disabled={loading || otp.length < 4}
-            className="w-full">
+            className="w-full bg-[#7f3d45] text-white px-4 py-3 rounded-lg hover:bg-[#6e343c] disabled:opacity-50">
             {loading ? t('loading') : t('verifyOTP')}
-          </TeleButton>
+          </button>
           <div className="text-center">
             {countdown > 0 ? (
               <p className="text-sm text-gray-500">

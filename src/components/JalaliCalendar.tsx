@@ -75,7 +75,7 @@ export default function JalaliCalendar({ value, onChange, label }: Props) {
   return (
     <div className="w-full relative" ref={ref} dir="rtl">
       {label && (
-        <label className="block mb-1 text-gray-800 font-medium">{label}</label>
+        <label className="block mb-1 text-[#7f3d45] font-medium">{label}</label>
       )}
 
       {/* input */}

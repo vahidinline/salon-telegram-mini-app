@@ -2,10 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import FileUpload from '../components/FileUpload';
 import CardNumberField from '../components/CardInfo';
-import Card from '../assets/img/bank-melat.jpg';
+import Card from '../assets/img/card.png';
 import api from '../utils/api';
 import { showTelegramAlert } from '../utils/telegram';
-import TeleButton from '../components/TeleButton';
 import PaymentCountdown from '../components/PaymentCountdown';
 
 function PaymentInfo() {
@@ -100,7 +99,7 @@ function PaymentInfo() {
           <div className="space-y-3 mt-4">
             <div className="flex justify-between">
               <span className="text-gray-600">نام صاحب کارت</span>
-              <span className="font-medium">مرجان</span>
+              <span className="font-medium">فاطمه ترکمن</span>
             </div>
 
             <div className="flex justify-between">

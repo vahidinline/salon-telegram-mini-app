@@ -266,6 +266,7 @@ const WeeklyCalendar: React.FC<{
             <span className="text-white font-bold text-md">
               تمایل دارید از کدام "شاخه" سرویس دریافت کنید؟
             </span>
+            <br />
             <span className="text-gray-100 font-bold text-sm ">
               <span>(</span>
               خدمات <span className=" text-sm">"قابل ارائه" </span>

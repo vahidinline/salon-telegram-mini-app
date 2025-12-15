@@ -19,7 +19,7 @@ const EmployeeSelect: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
 
   const salonId = '651a6b2f8b7a5a1d223e4c90';
-
+  console.log('employees', employees);
   useStaggerAnimation('.employee-card', containerRef);
 
   // Persian day translation map
@@ -105,15 +105,15 @@ const EmployeeSelect: React.FC = () => {
                   <div className="w-32 h-32 rounded-full  flex items-center justify-center text-white opacity-100">
                     {employee.avatar ? (
                       <img
-                        src={Marjan}
+                        src={employee.avatar}
                         alt={employee.name}
-                        className="w-full h-full  rounded-xl object-contain"
+                        className="w-full h-full  rounded-full object-cover"
                       />
                     ) : (
                       <img
                         src={Marjan}
                         alt={employee.name}
-                        className="w-full h-full bg-gray-300 rounded-xl object-cover"
+                        className="w-full h-full bg-gray-300 rounded-full object-fit"
                       />
                     )}
                   </div>

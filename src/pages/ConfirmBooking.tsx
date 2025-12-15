@@ -6,7 +6,6 @@ import jalaliday from 'jalaliday';
 import { ArrowLeftRight, Check } from 'lucide-react';
 import { useBooking } from '../context/BookingContext';
 import PhoneOTP from '../components/PhoneOTP';
-import TeleButton from '../components/TeleButton';
 import api from '../utils/api';
 import { getTelegramUser, showTelegramAlert } from '../utils/telegram';
 import gsap from 'gsap';
@@ -25,14 +24,16 @@ const ConfirmBooking: React.FC = () => {
   const [showSuccess, setShowSuccess] = useState(false);
   const successRef = useRef<HTMLDivElement>(null);
   const [dob, setDob] = useState('');
-  const telegramUser = getTelegramUser();
+  // const telegramUser = getTelegramUser();
   const { user } = useTelegramStore();
   const salonId = import.meta.env.VITE_SALON_ID;
   const isJalali = i18n.language === 'fa';
+  const telegramUser = JSON.parse(localStorage.getItem('telegramUser') || '{}');
   const userName = telegramUser?.first_name || 'Guest';
   const photoUrl = telegramUser?.photo_url || '';
   const [isGift, setIsGift] = useState(false);
   const [recipientName, setRecipientName] = useState('');
+  console.log('telegramUser', telegramUser);
   let gregorianDob = null;
   if (dob) {
     gregorianDob = dayjs(dob, 'YYYY/MM/DD')
@@ -101,7 +102,8 @@ const ConfirmBooking: React.FC = () => {
         additionalService: bookingState.additionalService,
         start: bookingState.slot.start,
         end: bookingState.slot.end,
-        user: user?.id,
+        user: telegramUser.id,
+        telegramUsername: telegramUser.username,
         clientName: user?.username,
         clientPhone: localStorage.getItem('phoneNumber') || '',
         orderType: isGift ? 'gift' : 'self',
@@ -186,6 +188,8 @@ const ConfirmBooking: React.FC = () => {
     return (
       <div className="min-h-screen bg-[#d6a78f] flex items-center justify-center p-6">
         <div ref={successRef} className="relative text-center">
+          {telegramUser.username}
+          {telegramUser.id}
           <div className="absolute inset-0 pointer-events-none">
             {[...Array(20)].map((_, i) => (
               <div
@@ -357,7 +361,7 @@ const ConfirmBooking: React.FC = () => {
                 value={recipientName}
                 onChange={(e) => setRecipientName(e.target.value)}
                 placeholder="لطفا نام شخص را وارد کنید"
-                className="w-full border rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                className="w-full border rounded-lg p-3 text-[#7f3d45] focus:outline-none focus:ring-2 focus:ring-blue-400"
               />
               <p className="text-sm text-red-500 mt-1">
                 هزینه سفارشات هدیه باید کامل پرداخت شود تا رزرو تکمیل شود
@@ -374,7 +378,7 @@ const ConfirmBooking: React.FC = () => {
         {/* Authentication / Confirm Button */}
         {!isAuthenticated ? (
           <div className="bg-white rounded-2xl shadow-lg p-6">
-            <h2 className="text-lg font-semibold text-gray-800 mb-4">
+            <h2 className="text-lg font-semibold text-[#7f3d45] mb-4">
               لطفا شماره موبایل خود را وارد کنید
             </h2>
             <PhoneOTP
