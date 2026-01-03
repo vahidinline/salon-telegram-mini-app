@@ -7,7 +7,7 @@ import { ArrowLeftRight, Check } from 'lucide-react';
 import { useBooking } from '../context/BookingContext';
 import PhoneOTP from '../components/PhoneOTP';
 import api from '../utils/api';
-import { getTelegramUser, showTelegramAlert } from '../utils/telegram';
+import { showTelegramAlert } from '../utils/telegram';
 import gsap from 'gsap';
 import { convertToPersianNumber } from '../utils/NumberFarsi';
 import { useTelegramStore } from '../store/useTelegramStore';
@@ -24,16 +24,17 @@ const ConfirmBooking: React.FC = () => {
   const [showSuccess, setShowSuccess] = useState(false);
   const successRef = useRef<HTMLDivElement>(null);
   const [dob, setDob] = useState('');
-  // const telegramUser = getTelegramUser();
   const { user } = useTelegramStore();
-  const salonId = import.meta.env.VITE_SALON_ID;
+  const salonId = '651a6b2f8b7a5a1d223e4c90';
   const isJalali = i18n.language === 'fa';
   const telegramUser = JSON.parse(localStorage.getItem('telegramUser') || '{}');
   const userName = telegramUser?.first_name || 'Guest';
   const photoUrl = telegramUser?.photo_url || '';
   const [isGift, setIsGift] = useState(false);
   const [recipientName, setRecipientName] = useState('');
-  console.log('telegramUser', telegramUser);
+
+  // console.log('telegramUser', telegramUser);
+
   let gregorianDob = null;
   if (dob) {
     gregorianDob = dayjs(dob, 'YYYY/MM/DD')
@@ -94,7 +95,6 @@ const ConfirmBooking: React.FC = () => {
 
     setLoading(true);
     try {
-      // Send booking request
       const response = await api.post(`/salons/${salonId}/bookings`, {
         salon: salonId,
         employee: bookingState.employee._id,
@@ -113,7 +113,6 @@ const ConfirmBooking: React.FC = () => {
 
       const bookingId = response.data.booking._id;
 
-      // Navigate and pass the booking ID in state
       navigate('/paymentinfo', {
         state: {
           service: bookingState.service,
@@ -127,7 +126,6 @@ const ConfirmBooking: React.FC = () => {
 
       setShowSuccess(true);
 
-      // Optional: reset booking after a delay
       setTimeout(() => {
         resetBooking();
       }, 3000);
@@ -138,16 +136,11 @@ const ConfirmBooking: React.FC = () => {
     }
   };
 
-  const formatDate = (date: Date) =>
-    isJalali
-      ? dayjs(date).calendar('jalali').format('DD MMMM YYYY')
-      : dayjs(date).format('DD MMMM YYYY');
-
   const formatTime = (datetime?: string) =>
     datetime ? dayjs(datetime).format('HH:mm') : '';
+
   const formatJalaliDate = (date: string | Date) => {
     const jalaliDate = dayjs(date).calendar('jalali');
-
     const persianMonths = [
       'فروردین',
       'اردیبهشت',
@@ -162,15 +155,13 @@ const ConfirmBooking: React.FC = () => {
       'بهمن',
       'اسفند',
     ];
-
     const day = convertToPersianNumber(jalaliDate.date());
     const month = persianMonths[jalaliDate.month()];
     const year = convertToPersianNumber(jalaliDate.year());
-
     return `${day} ${month} ${year}`;
   };
 
-  // ✅ Guard clause to prevent null render crash
+  // ✅ Guard clause
   if (
     !bookingState.slot ||
     !bookingState.date ||
@@ -178,7 +169,7 @@ const ConfirmBooking: React.FC = () => {
     !bookingState.employee
   ) {
     return (
-      <div className="min-h-screen flex items-center justify-center text-gray-500">
+      <div className="flex items-center justify-center h-[100dvh] text-gray-500 bg-[#d6a78f]">
         {t('loading')}...
       </div>
     );
@@ -186,10 +177,9 @@ const ConfirmBooking: React.FC = () => {
 
   if (showSuccess) {
     return (
-      <div className="min-h-screen bg-[#d6a78f] flex items-center justify-center p-6">
+      <div className="h-[100dvh] bg-[#d6a78f] flex items-center justify-center p-6 overflow-hidden">
         <div ref={successRef} className="relative text-center">
           {telegramUser.username}
-          {telegramUser.id}
           <div className="absolute inset-0 pointer-events-none">
             {[...Array(20)].map((_, i) => (
               <div
@@ -202,7 +192,7 @@ const ConfirmBooking: React.FC = () => {
               />
             ))}
           </div>
-          <div className="bg-[#d6a78f] rounded-full w-24 h-24 flex items-center justify-center mx-auto mb-6 shadow-lg">
+          <div className="bg-[#d6a78f] rounded-full w-24 h-24 flex items-center justify-center mx-auto mb-6 shadow-lg border-2 border-white/20">
             <Check size={48} className="text-green-500" />
           </div>
           <h2 className="text-3xl font-bold text-gray-800 mb-4">
@@ -215,49 +205,49 @@ const ConfirmBooking: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#d6a78f] pb-28 ">
-      {/* Header */}
-      <div className=" shadow-md sticky top-0 z-20">
+    // کانتینر اصلی با ارتفاع فیکس و بدون اسکرول کلی
+    <div className="flex flex-col h-[100dvh] bg-[#d6a78f] overflow-hidden">
+      {/* 1. هدر ثابت */}
+      <div className="flex-none shadow-md z-20 bg-[#d6a78f] w-full">
         <div className="max-w-4xl mx-auto p-4">
-          <h1 className="text-base  text-gray-100">
+          <h1 className="text-base text-gray-100">
             لطفا <span className="font-bold">"جزئیات رزرو "</span> خود را تایید
             کنید.
           </h1>
         </div>
       </div>
 
-      <div className="max-w-4xl mx-auto p-4 space-y-6">
+      {/* 2. محتوای اسکرول‌شونده (شامل کارت‌ها و فرم‌ها) */}
+      <div className="flex-1 overflow-y-auto p-4 space-y-4 w-full max-w-4xl mx-auto scrollbar-hide pb-6">
         {/* Summary Card */}
-        <div className="bg-white rounded-2xl shadow-lg p-6 space-y-4">
+        <div className="bg-white rounded-2xl shadow-lg p-5 space-y-4">
           <h2 className="text-lg font-semibold text-[#7f3d45]">
             {t('summary')}
           </h2>
 
-          {/* Employee & User */}
-          <div className="flex items-center gap-4 p-4 border rounded-xl shadow-sm bg-gray-50">
+          <div className="flex items-center gap-4 p-3 border rounded-xl shadow-sm bg-gray-50">
             <div className="flex flex-col items-center">
               <img
                 src={bookingState.employee.avatar}
                 alt={bookingState.employee.name}
-                className="w-16 h-16 rounded-full object-cover border-2 border-blue-200"
+                className="w-14 h-14 rounded-full object-cover border-2 border-blue-200"
               />
-              <span className="font-medium mt-1">
+              <span className="font-medium mt-1 text-sm">
                 {bookingState.employee.name}
               </span>
             </div>
-            <ArrowLeftRight size={32} className="mx-auto text-gray-400" />
+            <ArrowLeftRight size={24} className="mx-auto text-gray-400" />
             <div className="flex flex-col items-center">
               <img
                 src={photoUrl || ''}
                 alt={userName}
-                className="w-16 h-16 rounded-full object-cover border-2 border-blue-200"
+                className="w-14 h-14 rounded-full object-cover border-2 border-blue-200"
               />
-              <span className="font-medium mt-1">{userName}</span>
+              <span className="font-medium mt-1 text-sm">{userName}</span>
             </div>
           </div>
 
-          {/* Booking Details */}
-          <div className="space-y-2">
+          <div className="space-y-2 text-sm">
             <div className="flex justify-between text-gray-600">
               <span>{t('service')}:</span>
               <span className="font-medium">{bookingState.service.name}</span>
@@ -265,9 +255,7 @@ const ConfirmBooking: React.FC = () => {
             {bookingState.additionalService && (
               <div className="flex justify-between gap-2 text-gray-600">
                 <span>{t('additionalServices')}:</span>
-                <span
-                  dir="rtl"
-                  className="font-medium text-xs text-right justify-center underline underline-offset-4">
+                <span className="font-medium text-xs underline underline-offset-4">
                   {bookingState.additionalService.name}
                 </span>
               </div>
@@ -286,8 +274,7 @@ const ConfirmBooking: React.FC = () => {
               </span>
             </div>
 
-            {/* Prices */}
-            <div className="pt-3 border-t flex justify-between items-center text-lg">
+            <div className="pt-3 border-t flex justify-between items-center text-base">
               <span className="font-semibold text-gray-800">{t('price')}:</span>
               <span className="font-bold text-[#7f3d45]">
                 {convertToPersianNumber(bookingState.service.price)}{' '}
@@ -297,7 +284,7 @@ const ConfirmBooking: React.FC = () => {
 
             {bookingState.additionalService && (
               <>
-                <div className="pt-2 flex justify-between items-center text-lg">
+                <div className="pt-2 flex justify-between items-center text-base">
                   <span className="font-semibold text-gray-800">
                     {t('additionalPrice')}:
                   </span>
@@ -308,7 +295,7 @@ const ConfirmBooking: React.FC = () => {
                     {t('toman')}
                   </span>
                 </div>
-                <div className="pt-2 flex justify-between items-center text-lg border-t">
+                <div className="pt-2 flex justify-between items-center text-base border-t mt-1">
                   <span className="font-semibold text-gray-800">
                     {t('totalPrice')}:
                   </span>
@@ -326,12 +313,9 @@ const ConfirmBooking: React.FC = () => {
         </div>
 
         {/* Order Type Card */}
-        <div className="bg-white rounded-2xl shadow-lg p-6 space-y-4">
-          {/* <h2 className="text-lg font-semibold text-gray-800 mb-2">
-            {t('orderType')}
-          </h2> */}
-          <div className="flex flex-col  gap-6">
-            <label className="flex items-center gap-2 cursor-pointer text-gray-700 text-xs">
+        <div className="bg-white rounded-2xl shadow-lg p-5 space-y-4">
+          <div className="flex flex-col gap-4">
+            <label className="flex items-center gap-3 cursor-pointer text-gray-700 text-sm p-2 rounded-lg hover:bg-gray-50 transition">
               <input
                 type="radio"
                 name="orderType"
@@ -342,7 +326,7 @@ const ConfirmBooking: React.FC = () => {
               این وقت رو برای خودم گرفتم.
             </label>
 
-            <label className="flex items-center gap-2 cursor-pointer text-gray-700 text-xs">
+            <label className="flex items-center gap-3 cursor-pointer text-gray-700 text-sm p-2 rounded-lg hover:bg-gray-50 transition">
               <input
                 type="radio"
                 name="orderType"
@@ -355,29 +339,32 @@ const ConfirmBooking: React.FC = () => {
           </div>
 
           {isGift && (
-            <div className="mt-3">
+            <div className="mt-2 animate-fadeIn">
               <input
                 type="text"
                 value={recipientName}
                 onChange={(e) => setRecipientName(e.target.value)}
                 placeholder="لطفا نام شخص را وارد کنید"
-                className="w-full border rounded-lg p-3 text-[#7f3d45] focus:outline-none focus:ring-2 focus:ring-blue-400"
+                className="w-full border rounded-lg p-3 text-[#7f3d45] focus:outline-none focus:ring-2 focus:ring-[#7f3d45]"
               />
-              <p className="text-sm text-red-500 mt-1">
-                هزینه سفارشات هدیه باید کامل پرداخت شود تا رزرو تکمیل شود
+              <p className="text-xs text-red-500 mt-2">
+                هزینه سفارشات هدیه باید کامل پرداخت شود.
               </p>
             </div>
           )}
-          <JalaliCalendar
-            value={dob}
-            onChange={setDob}
-            label="لطفا تاریخ تولد خود را وارد کنید"
-          />
+
+          <div className="pt-2">
+            <JalaliCalendar
+              value={dob}
+              onChange={setDob}
+              label="لطفا تاریخ تولد خود را وارد کنید"
+            />
+          </div>
         </div>
 
-        {/* Authentication / Confirm Button */}
-        {!isAuthenticated ? (
-          <div className="bg-white rounded-2xl shadow-lg p-6">
+        {/* Authentication Form (If NOT authenticated, keep it in scroll area) */}
+        {!isAuthenticated && (
+          <div className="bg-white rounded-2xl shadow-lg p-6 mb-4">
             <h2 className="text-lg font-semibold text-[#7f3d45] mb-4">
               لطفا شماره موبایل خود را وارد کنید
             </h2>
@@ -386,15 +373,20 @@ const ConfirmBooking: React.FC = () => {
               telegramUserId={telegramUser?.id}
             />
           </div>
-        ) : (
+        )}
+      </div>
+
+      {/* 3. فوتر ثابت (فقط برای دکمه نهایی) */}
+      {isAuthenticated && (
+        <div className="flex-none p-4 bg-[#d6a78f] border-t border-[#7f3d45]/20 z-20 w-full max-w-4xl mx-auto">
           <button
             onClick={handleConfirm}
             disabled={loading}
-            className="w-full py-4 rounded-xl bg-[#7f3d45]  text-white font-semibold hover:bg-[#7f3d45] transition">
+            className="w-full py-3.5 rounded-xl bg-[#7f3d45] text-white font-semibold shadow-lg hover:bg-[#6d323a] active:scale-[0.98] transition-all disabled:opacity-70">
             {loading ? t('loading') : t('confirm')}
           </button>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 };

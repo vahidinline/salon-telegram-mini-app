@@ -1,39 +1,115 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
 import jalaliday from 'jalaliday';
-import { useTranslation } from 'react-i18next';
-import api from '../utils/api';
-import 'dayjs/locale/fa';
 import Lottie from 'lottie-react';
-dayjs.extend(jalaliday);
+import gsap from 'gsap';
+import 'dayjs/locale/fa';
+
+import api from '../utils/api';
+import { getTelegramUser } from '../utils/telegram';
+import { useTelegramStore } from '../store/useTelegramStore';
+import { usePrefersReducedMotion } from '../hooks/useAnimations';
+
 import wellcomeAnimation from '../assets/img/wellcome.json';
-import Welcome from './Welcome';
-import { useNavigate } from 'react-router-dom';
+import Logo from '../assets/img/logo02.png';
+
+dayjs.extend(jalaliday);
 
 interface DayStatus {
   date: string;
   hasWorkingEmployee: boolean;
   hasFreeSlot: boolean;
+  employees: any[];
 }
 
-const WeeklyCalendar: React.FC<{
-  salonId: string;
-  onDaySelect: (date: string) => void;
-}> = ({ salonId, onDaySelect }) => {
-  const { i18n } = useTranslation();
-  const isJalali = i18n.language === 'fa';
+interface Category {
+  title: string;
+  name: string;
+  description: string;
+  type: string;
+  code: string;
+}
+
+const WeeklyCalendar: React.FC = () => {
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
+  const isJalali = i18n.language === 'fa';
+
+  // State
   const [week, setWeek] = useState<DayStatus[]>([]);
   const [loading, setLoading] = useState(false);
-  const [selectedDay, setSelectedDay] = useState<any | null>(null);
+  const [selectedDay, setSelectedDay] = useState<DayStatus | null>(null);
 
+  // User Store & Refs
+  const { user, setUser } = useTelegramStore();
+  const headerRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const prefersReducedMotion = usePrefersReducedMotion();
+
+  const userName = user?.first_name || 'Guest';
+
+  // 1. Initialize User (Merged from Welcome.tsx)
+  useEffect(() => {
+    let telegramUser = getTelegramUser();
+
+    if (!telegramUser) {
+      telegramUser = {
+        id: 123456789,
+        first_name: 'Vahid',
+        last_name: 'Afshari',
+        username: 'vahiddev',
+        photo_url: '',
+      };
+      // console.warn('⚠️ Using mock Telegram user data');
+    }
+    setUser(telegramUser);
+  }, [setUser]);
+
+  // 2. Fetch Weekly Calendar Data
   useEffect(() => {
     generateWeek();
   }, []);
 
-  const handleSelectedDay = () => {
-    setSelectedDay(null);
-  };
+  // 3. Header Animation (Merged from Welcome.tsx)
+  useEffect(() => {
+    if (!headerRef.current || prefersReducedMotion) return;
+
+    const logo = headerRef.current.querySelector('.app-logo');
+    const title = headerRef.current.querySelector('.welcome-title');
+
+    const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
+
+    tl.fromTo(
+      logo,
+      { opacity: 0, scale: 0.8 },
+      { opacity: 1, scale: 1, duration: 0.6 }
+    ).fromTo(
+      title,
+      { opacity: 0, y: -10 },
+      { opacity: 1, y: 0, duration: 0.5 },
+      '-=0.3'
+    );
+  }, [prefersReducedMotion]);
+
+  // 4. Animate Content Entrance
+  useEffect(() => {
+    if (!loading && contentRef.current && !prefersReducedMotion) {
+      gsap.fromTo(
+        contentRef.current.children,
+        { opacity: 0, y: 20 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.5,
+          stagger: 0.05,
+          ease: 'power2.out',
+          clearProps: 'all',
+        }
+      );
+    }
+  }, [loading, selectedDay, prefersReducedMotion]);
 
   const generateWeek = async () => {
     setLoading(true);
@@ -47,7 +123,7 @@ const WeeklyCalendar: React.FC<{
           `/salons/651a6b2f8b7a5a1d223e4c90/availability/freeslots`,
           { params: { date: dateStr } }
         );
-        console.log('res', res);
+
         const employees = res.data;
 
         const weekday = dateObj
@@ -73,7 +149,7 @@ const WeeklyCalendar: React.FC<{
           date: dateStr,
           hasWorkingEmployee,
           hasFreeSlot,
-          employees: enhancedEmployees, // ⬅ مهم
+          employees: enhancedEmployees,
         };
       } catch (error) {
         return {
@@ -90,7 +166,7 @@ const WeeklyCalendar: React.FC<{
     setLoading(false);
   };
 
-  const categories = [
+  const categories: Category[] = [
     {
       title: 'ROSE',
       name: ' خدمات Basic  تیم Nials By Marjan',
@@ -125,244 +201,209 @@ const WeeklyCalendar: React.FC<{
     },
   ];
 
-  // const generateWeek = async () => {
-  //   const temp: DayStatus[] = [];
-  //   setLoading(true);
-
-  //   for (let i = 0; i < 7; i++) {
-  //     const dateObj = dayjs().add(i, 'day');
-  //     const dateStr = dateObj.format('YYYY-MM-DD');
-
-  //     try {
-  //       const res = await api.get(
-  //         `/salons/651a6b2f8b7a5a1d223e4c90/availability/freeslots`,
-  //         {
-  //           params: { date: dateStr },
-  //         }
-  //       );
-
-  //       const employees = res.data;
-  //       console.log('employees', employees);
-  //       const hasWorkingEmployee = employees.some(
-  //         (e: any) =>
-  //           !!e.employee.workSchedule.find((w: any) => {
-  //             const weekday = dateObj
-  //               .toDate()
-  //               .toLocaleDateString('en-US', { weekday: 'long' })
-  //               .toLowerCase();
-  //             return w.day.toLowerCase() === weekday;
-  //           })
-  //       );
-
-  //       const hasFreeSlot = employees.some((e: any) => e.hasFreeSlot);
-
-  //       temp.push({
-  //         date: dateStr,
-  //         hasWorkingEmployee,
-  //         hasFreeSlot,
-  //       });
-  //     } catch (e) {
-  //       temp.push({
-  //         date: dateStr,
-  //         hasWorkingEmployee: false,
-  //         hasFreeSlot: false,
-  //       });
-  //     }
-  //   }
-
-  //   setWeek(temp);
-  //   setLoading(false);
-  // };
-
   const persianNumber = (num: string | number) =>
     num.toString().replace(/\d/g, (d) => '۰۱۲۳۴۵۶۷۸۹'[parseInt(d)]);
 
   const formatDate = (date: string) => {
     if (isJalali) {
       const d = dayjs(date).locale('fa').calendar('jalali');
-      // format day with Persian numerals and full month name
       const day = persianNumber(d.format('D'));
-      const month = d.format('MMMM'); // full month name
-      const weekday = d.format('dddd'); // weekday name
+      const month = d.format('MMMM');
+      const weekday = d.format('dddd');
       return `${weekday} ${day} ${month}`;
     } else {
       return dayjs(date).format('dddd, MMM D');
     }
   };
 
-  if (loading)
+  const handleSelectedDay = () => {
+    setSelectedDay(null);
+  };
+
+  // --- Render ---
+
+  if (loading) {
     return (
-      <div className="p-4 bg-[#d6a78f] h-screen text-center">
-        {' '}
-        <div className="flex  items-center justify-center">
+      <div className="flex flex-col h-[100dvh] items-center justify-center bg-[#d6a78f]">
+        <div className="w-full max-w-sm px-8">
           <Lottie
             animationData={wellcomeAnimation}
             loop={true}
-            style={{ width: '100%', height: '100%' }}
+            style={{ width: '100%', height: 'auto' }}
           />
         </div>
+        <p className="text-white mt-4 animate-pulse">
+          در حال دریافت اطلاعات...
+        </p>
       </div>
     );
+  }
 
   return (
-    <div className=" space-y-3 flex min-h-screen flex-col items-center justify-center bg-[#d6a78f] p-6 ">
-      <Welcome />
-      {!selectedDay && (
-        <>
-          <span className="flex text-md justify-center text-[#fffffa] font-bold text-shadow-md">
-            لطفا
-            <span className="text-md font-bold mx-1"> "تاریخ"</span>
-            مورد نظر خود را برای رزرو انتخاب کنید.
-          </span>
-          {week.map((day) => {
-            const disabled = !day.hasWorkingEmployee;
+    // کانتینر اصلی: ارتفاع فیکس و بدون اسکرول بادی
+    <div className="flex flex-col h-[100dvh] bg-[#d6a78f] overflow-hidden">
+      {/* 1. Header (Fixed) - Replaces Welcome Component */}
+      <div
+        ref={headerRef}
+        className="flex-none w-full flex flex-col items-center pt-6 pb-2 px-4 z-10">
+        <div className="w-full max-w-xs flex justify-center mb-4">
+          <img
+            src={Logo}
+            alt="App Logo"
+            className="app-logo h-16 object-contain drop-shadow-sm"
+          />
+        </div>
+        <h1 className="welcome-title text-xl font-bold text-gray-100 text-shadow-sm">
+          {t('hello', { name: userName })}
+        </h1>
+      </div>
 
-            return (
-              <button
-                key={day.date}
-                disabled={disabled}
-                onClick={() => setSelectedDay(day)} // ⬅ روز انتخاب شده ذخیره می‌شود
-                className={`w-full text-left p-4 rounded-xl border flex justify-between items-center h-8
-    ${
-      disabled
-        ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-        : 'bg-white hover:bg-blue-50'
-    }
-  `}>
-                {/* <span className=" text-[#7f3d45] font-bold">
+      {/* 2. Scrollable Content Area */}
+      <div className="flex-1 overflow-y-auto px-4 pb-8 w-full max-w-md mx-auto scrollbar-hide">
+        <div ref={contentRef} className="space-y-3">
+          {/* VIEW 1: DAY SELECTION */}
+          {!selectedDay && (
+            <>
+              <div className="text-center py-2 mb-2 sticky top-0 bg-[#d6a78f] z-10">
+                <span className="text-md text-[#fffffa] font-bold drop-shadow-md">
+                  لطفا <span className="text-lg mx-1 text-white">"تاریخ"</span>{' '}
+                  مورد نظر را انتخاب کنید.
+                </span>
+              </div>
 
-                </span> */}
+              {week.map((day) => {
+                const disabled = !day.hasWorkingEmployee;
+                return (
+                  <button
+                    key={day.date}
+                    disabled={disabled}
+                    onClick={() => setSelectedDay(day)}
+                    className={`
+                      w-full text-left p-4 rounded-xl border flex justify-between items-center h-14 transition-all duration-200 active:scale-[0.98] shadow-sm
+                      ${
+                        disabled
+                          ? 'bg-white/50 text-gray-500 cursor-not-allowed border-transparent'
+                          : 'bg-white hover:bg-blue-50 border-white'
+                      }
+                    `}>
+                    {disabled ? (
+                      <span className="text-gray-500 opacity-70 text-sm font-medium">
+                        {formatDate(day.date)}
+                      </span>
+                    ) : (
+                      <span
+                        className={`font-bold ${
+                          day.hasFreeSlot ? 'text-[#7f3d45]' : 'text-red-500'
+                        }`}>
+                        {formatDate(day.date)}
+                      </span>
+                    )}
 
-                {disabled ? (
-                  <span className="text-gray-400"> {formatDate(day.date)}</span>
-                ) : day.hasFreeSlot ? (
-                  <span className="text-[#7f3d45] font-bold">
-                    {' '}
-                    {formatDate(day.date)}
+                    {disabled ? (
+                      <span className="text-xs bg-gray-200 px-2 py-1 rounded text-gray-500">
+                        تعطیل
+                      </span>
+                    ) : day.hasFreeSlot ? (
+                      <span className="text-xs bg-[#7f3d45] text-white px-3 py-1 rounded-full font-bold">
+                        انتخاب
+                      </span>
+                    ) : (
+                      <span className="text-xs text-red-500 font-bold border border-red-200 px-2 py-1 rounded bg-red-50">
+                        تکمیل شد
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </>
+          )}
+
+          {/* VIEW 2: CATEGORY SELECTION */}
+          {selectedDay && (
+            <div className="animate-fadeIn">
+              {/* Header for Category View */}
+              <div className="bg-[#d6a78f] pb-4 pt-1 sticky top-0 z-20">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-white font-bold text-sm">
+                    خدمات قابل ارائه در {formatDate(selectedDay.date)}
                   </span>
-                ) : (
-                  <span className="text-red-500 font-bold">
-                    {formatDate(day.date)}
-                  </span>
-                )}
-
-                {disabled ? (
-                  <span className="text-gray-400"> تعطیل</span>
-                ) : day.hasFreeSlot ? (
-                  <span className="text-[#7f3d45] font-bold"> انتخاب روز</span>
-                ) : (
-                  <span className="text-red-500 font-bold">
-                    همه وقت‌ها پر هستند
-                  </span>
-                )}
-              </button>
-            );
-          })}
-        </>
-      )}
-      {selectedDay && (
-        <>
-          <div className="h-16 text-center">
-            <span className="text-white font-bold text-md">
-              تمایل دارید از کدام "شاخه" سرویس دریافت کنید؟
-            </span>
-            <br />
-            <span className="text-gray-100 font-bold text-sm ">
-              <span>(</span>
-              خدمات <span className=" text-sm">"قابل ارائه" </span>
-              در روز {formatDate(selectedDay.date)}
-            </span>
-            <span className="text-white">)</span>
-          </div>
-          <div className="relative w-full p-2 bg-[#d6a78f]  rounded-xl shadow-md border">
-            {/* Top Row: Close Button (Left) + Title (Right) */}
-            <div className="flex items-center justify-between px-2 py-1 absolute top-2 left-0 right-0">
-              {/* Title Text */}
-
-              {/* Close Button */}
-              <button
-                onClick={() => handleSelectedDay()}
-                className="p-1 rounded-full hover:bg-gray-100 transition">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="26"
-                  height="26"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="text-gray-100">
-                  <circle cx="12" cy="12" r="10" />
-                  <path d="m15 9-6 6" />
-                  <path d="m9 9 6 6" />
-                </svg>
-              </button>
-            </div>
-
-            {/* Add padding so content doesn't overlap top bar */}
-            <div className="pt-12">
-              {selectedDay.employees.length === 0 && (
-                <p className="text-gray-500">
-                  هیچ کارمندی برای این روز ثبت نشده است.
+                  <button
+                    onClick={handleSelectedDay}
+                    className="p-1.5 bg-white/20 rounded-full hover:bg-white/30 text-white transition backdrop-blur-sm">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round">
+                      <line x1="18" y1="6" x2="6" y2="18"></line>
+                      <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                  </button>
+                </div>
+                <div className="h-px bg-white/30 w-full mb-2"></div>
+                <p className="text-center text-white text-lg font-bold">
+                  کدام "شاخه" را ترجیح می‌دهید؟
                 </p>
-              )}
+              </div>
 
-              <div className="space-y-2">
+              {/* Categories List */}
+              <div className="space-y-3 bg-white/10 p-3 rounded-2xl border border-white/20">
+                {selectedDay.employees.length === 0 && (
+                  <p className="text-white/80 text-center py-4">
+                    هیچ کارمندی برای این روز ثبت نشده است.
+                  </p>
+                )}
+
                 {categories.map((c, idx) => {
                   const isVIP = c.type?.toLowerCase() === 'vip';
-
                   return (
                     <div
-                      onClick={() => {
-                        navigate('/services', {
-                          state: { code: c.code },
-                        });
-                      }}
                       key={idx}
+                      onClick={() => {
+                        navigate('/services', { state: { code: c.code } });
+                      }}
                       className={`
-              p-4 border rounded-xl transition shadow-sm
-              ${
-                isVIP
-                  ? 'bg-gray-50 border-gray-300'
-                  : // ? 'bg-gradient-to-br from-[#fdf5e6] via-[#fff8dc] to-[#f5e6c4] border-yellow-400 shadow-[0_0_12px_rgba(255,215,0,0.4)]'
-                    'bg-gray-50 border-gray-300'
-              }
-            `}>
-                      {/* VIP Badge */}
+                        cursor-pointer p-4 border rounded-xl transition-transform active:scale-[0.99] shadow-md
+                        ${
+                          isVIP
+                            ? 'bg-gradient-to-r from-gray-50 to-yellow-50/50 border-yellow-200'
+                            : 'bg-white border-gray-100'
+                        }
+                      `}>
                       {isVIP && (
-                        <div className="flex items-center gap-1 mb-2">
-                          <span className="text-yellow-600 font-semibold text-sm">
-                            VIP Service
+                        <div className="flex items-center justify-center gap-1 mb-2">
+                          <span className="text-yellow-600 font-bold text-xs bg-yellow-100 px-2 py-0.5 rounded-full border border-yellow-200">
+                            VIP Service ✨
                           </span>
-                          <span className="text-yellow-600">✨</span>
                         </div>
                       )}
 
-                      <span
-                        className={`block font-semibold text-center text-lg ${
-                          isVIP ? 'text-yellow-700' : 'text-yellow-700'
+                      <h3
+                        className={`block font-bold text-center text-lg mb-2 ${
+                          isVIP ? 'text-yellow-800' : 'text-[#7f3d45]'
                         }`}>
                         {c?.title || c.name}
-                      </span>
+                      </h3>
 
-                      <p
-                        className={`text-sm text-center mt-1 ${
-                          isVIP ? 'text-yellow-800/90' : 'text-yellow-700'
-                        }`}>
-                        <p
-                          dangerouslySetInnerHTML={{ __html: c.description }}
-                        />
-                      </p>
+                      <div
+                        className={`text-sm text-center leading-relaxed ${
+                          isVIP ? 'text-gray-700' : 'text-gray-600'
+                        }`}
+                        dangerouslySetInnerHTML={{ __html: c.description }}
+                      />
                     </div>
                   );
                 })}
               </div>
             </div>
-          </div>
-        </>
-      )}
+          )}
+        </div>
+      </div>
     </div>
   );
 };

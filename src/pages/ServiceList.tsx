@@ -10,39 +10,36 @@ import { showTelegramAlert } from '../utils/telegram';
 import { useStaggerAnimation } from '../hooks/useAnimations';
 import { convertToPersianNumber } from '../utils/NumberFarsi';
 import ServiceFeaturesAccordion from '../components/Accrodion';
-import TeleButton from '../components/TeleButton';
 
 const ServiceList: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const location = useLocation();
   const { setService } = useBooking();
   const [services, setServices] = useState<Service[]>([]);
   const [filteredServices, setFilteredServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const containerRef = useRef<HTMLDivElement>(null);
-  const [selectedServiceId, setSelectedServiceId] = useState<string | null>(
-    null
-  );
-  const [selectedSubService, setSelectedSubService] = useState(null);
 
-  const salonId = import.meta.env.VITE_SALON_ID;
-  const [code, setCode] = useState();
-  const state = useLocation();
+  // دریافت کد از state با هندل کردن حالت undefined
+  const code = location.state?.code;
 
-  console.log(code);
   useStaggerAnimation('.service-card', containerRef);
 
+  // 1. دریافت سرویس‌ها
   useEffect(() => {
-    setCode(state.state.code);
+    if (!code) {
+      navigate('/'); // اگر کدی نبود برگرد به صفحه اصلی
+      return;
+    }
+
     const fetchServices = async () => {
       try {
         const response = await api.get(
           `/salons/651a6b2f8b7a5a1d223e4c90/services`
         );
-        console.log('Fetched services:', response.data);
         setServices(response.data);
-        setFilteredServices(response.data);
       } catch (error: any) {
         showTelegramAlert(error.response?.data?.message || t('error'));
       } finally {
@@ -51,16 +48,27 @@ const ServiceList: React.FC = () => {
     };
 
     fetchServices();
-  }, [salonId, t]);
+  }, [code, navigate, t]);
 
+  // 2. فیلتر کردن بر اساس سرچ و کد دسته‌بندی
   useEffect(() => {
-    const filtered = services.filter(
-      (service) =>
+    if (!code) return;
+
+    const filtered = services.filter((service) => {
+      // اول بررسی میکنیم که آیا کد سرویس با کد صفحه یکی هست؟
+      const matchesCode = service.code?.toLowerCase() === code.toLowerCase();
+
+      // دوم بررسی سرچ کاربر
+      const matchesSearch =
         service.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        service.description?.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+        service.description?.toLowerCase().includes(searchQuery.toLowerCase());
+
+      return matchesCode && matchesSearch;
+    });
+
     setFilteredServices(filtered);
-  }, [searchQuery, services]);
+  }, [searchQuery, services, code]);
+
   const handleSelectService = (service: Service) => {
     setService(service);
 
@@ -80,10 +88,12 @@ const ServiceList: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen pb-20 ">
-      <div className="bg-[#d6a78f] shadow-sm sticky top-0 z-10">
-        <div className="max-w-4xl mx-auto p-4 ">
-          <h1 className="text-base  text-white mb-4">
+    // کانتینر اصلی: ارتفاع فیکس و بدون اسکرول بادی
+    <div className="flex flex-col h-[100dvh] bg-[#d6a78f] overflow-hidden">
+      {/* هدر ثابت */}
+      <div className="flex-none bg-[#d6a78f] shadow-sm z-10 w-full">
+        <div className="max-w-4xl mx-auto p-4">
+          <h1 className="text-base text-white mb-4">
             لطفا سرویس خود را از{' '}
             <span className="font-bold">"شاخه {code}"</span> انتخاب کنید.
           </h1>
@@ -97,102 +107,96 @@ const ServiceList: React.FC = () => {
               placeholder={t('search')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full ps-10 pe-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full ps-10 pe-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#7f3d45] focus:border-transparent outline-none shadow-sm"
             />
           </div>
         </div>
       </div>
 
+      {/* لیست اسکرول‌شونده */}
       <div
         ref={containerRef}
-        className="max-w-4xl mx-auto p-4 bg-[#d6a78f] space-y-3">
+        className="flex-1 overflow-y-auto p-4 space-y-3 w-full max-w-4xl mx-auto scrollbar-hide pb-8">
         {filteredServices.length === 0 ? (
-          <div className="text-center py-12 text-gray-500">
-            {t('noResults')}
+          <div className="flex flex-col items-center justify-center py-12 text-white/80">
+            <Search size={48} className="mb-2 opacity-50" />
+            <p>{t('noResults')}</p>
           </div>
         ) : (
-          filteredServices
-            .filter((service) => service.code === code.toLowerCase())
-            .map((service) => {
-              const isVIP = service.serviceType?.toLowerCase() === 'vip';
+          filteredServices.map((service) => {
+            const isVIP = service.serviceType?.toLowerCase() === 'vip';
 
-              return (
-                <div
-                  key={service._id}
-                  className={`
-              p-4 border rounded-xl transition shadow-sm
-              ${
-                isVIP
-                  ? 'bg-gray-50 border-gray-300'
-                  : 'bg-gray-50 border-gray-300'
-              }
-            `}
-                  // className=" service-card bg-white  rounded-lg shadow-sm p-4 cursor-pointer hover:shadow-md transition-all duration-200 active:scale-98"
-                >
-                  {' '}
+            return (
+              <div
+                key={service._id}
+                // کلاس‌های شرطی و ثابت ادغام شدند
+                className={`service-card p-4 border rounded-xl transition shadow-sm relative overflow-hidden
+                  ${
+                    isVIP
+                      ? 'bg-gradient-to-br from-gray-50 to-yellow-50/30 border-yellow-200'
+                      : 'bg-gray-50 border-gray-200'
+                  }
+                `}>
+                {/* برچسب نوع سرویس */}
+                <div className="flex items-center gap-1 mb-2">
                   {isVIP ? (
-                    <div className="flex items-center gap-1 mb-2">
-                      <span className="text-yellow-600 font-semibold text-sm">
+                    <>
+                      <span className="text-yellow-600 font-bold text-xs bg-yellow-100 px-2 py-0.5 rounded-full">
                         VIP Service
                       </span>
-                      <span className="text-yellow-600">✨</span>
-                    </div>
+                    </>
                   ) : (
-                    <div className="flex items-center gap-1 mb-2">
-                      <span className="text-[#C0C0C0] font-semibold text-sm">
-                        BASIC Service
-                      </span>
-                    </div>
+                    <span className="text-gray-400 font-semibold text-xs bg-gray-200 px-2 py-0.5 rounded-full">
+                      BASIC Service
+                    </span>
                   )}
-                  {service.type}
-                  <h3
-                    className={`block font-semibold text-lg ${
-                      isVIP ? 'text-yellow-700' : 'text-gray-800'
-                    }`}>
-                    {service.name}
-                  </h3>
-                  {service.description && (
-                    <p className="text-sm text-gray-600 mb-3">
-                      {service.description}
-                    </p>
-                  )}
-                  <ServiceFeaturesAccordion service={service} />
-                  <div className="flex items-center justify-between text-sm">
-                    <div className="flex items-center gap-1 text-gray-600">
-                      <Clock size={16} />
-                      مدت زمان حدودی:
-                      <span>
-                        {convertToPersianNumber(service.duration)}{' '}
-                        {t('minutes')}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-1 font-bold text-blue-600 ">
-                      <span>
-                        <span className="text-[#7f3d45] text-lg">
-                          {service.price != null
-                            ? convertToPersianNumber(
-                                service.price.toLocaleString()
-                              ) +
-                              ' ' +
-                              t('toman')
-                            : '-'}{' '}
-                        </span>
-                      </span>
-                    </div>
+                </div>
+
+                <h3
+                  className={`block font-bold text-lg mb-1 ${
+                    isVIP ? 'text-yellow-800' : 'text-gray-800'
+                  }`}>
+                  {service.name}
+                </h3>
+
+                {service.description && (
+                  <p className="text-sm text-gray-600 mb-3 leading-relaxed">
+                    {service.description}
+                  </p>
+                )}
+
+                <ServiceFeaturesAccordion service={service} />
+
+                <div className="flex items-center justify-between text-sm mt-4 pt-3 border-t border-gray-200">
+                  <div className="flex items-center gap-1 text-gray-500">
+                    <Clock size={16} />
+                    <span>
+                      {convertToPersianNumber(service.duration)} {t('minutes')}
+                    </span>
                   </div>
-                  <div>
-                    <button
-                      onClick={() => handleSelectService(service)}
-                      className="w-full mt-4 bg-[#7f3d45] rounded rounded-lg h-10 ">
-                      <span className="text-white font-bold ">
-                        {' '}
-                        {t('selectService')}
-                      </span>
-                    </button>
+
+                  <div className="font-bold">
+                    <span className="text-[#7f3d45] text-lg">
+                      {service.price != null
+                        ? convertToPersianNumber(service.price.toLocaleString())
+                        : '-'}
+                    </span>
+                    <span className="text-xs text-gray-500 mr-1">
+                      {t('toman')}
+                    </span>
                   </div>
                 </div>
-              );
-            })
+
+                <button
+                  onClick={() => handleSelectService(service)}
+                  className="w-full mt-4 bg-[#7f3d45] hover:bg-[#6d323a] active:scale-[0.98] transition-all rounded-lg h-11 shadow-md flex items-center justify-center gap-2">
+                  <span className="text-white font-bold text-sm">
+                    {t('selectService')}
+                  </span>
+                </button>
+              </div>
+            );
+          })
         )}
       </div>
     </div>

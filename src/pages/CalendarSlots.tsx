@@ -7,9 +7,7 @@ import { TimeSlot } from '../types';
 import { useBooking } from '../context/BookingContext';
 import LoadingSpinner from '../components/LoadingSpinner';
 import SlotCard from '../components/SlotCard';
-import TeleButton from '../components/TeleButton';
 import 'dayjs/locale/fa';
-import { convertToPersianNumber } from '../utils/NumberFarsi';
 import api from '../utils/api';
 import JalaliMonthlyCalendar from '../components/MonthlyCal';
 
@@ -23,21 +21,14 @@ const CalendarSlots: React.FC = () => {
   const [slots, setSlots] = useState<TimeSlot[]>([]);
   const [selectedSlot, setSelectedSlot] = useState<TimeSlot | null>(null);
   const [loading, setLoading] = useState(false);
-  const [calendar, setCalendar] = useState<Date[]>([]);
+
   const isJalali = i18n.language === 'fa';
-  console.log(
-    'Booking State:',
-    bookingState,
-    selectedDate,
-    slots,
-    selectedSlot
-  );
+
   useEffect(() => {
     if (!bookingState.service || !bookingState.employee) {
       navigate('/');
       return;
     }
-    generateCalendar();
   }, [bookingState, navigate]);
 
   useEffect(() => {
@@ -46,78 +37,11 @@ const CalendarSlots: React.FC = () => {
     }
   }, [selectedDate]);
 
-  const generateCalendar = () => {
-    const dates: Date[] = [];
-    for (let i = 0; i < 14; i++) {
-      dates.push(dayjs().add(i, 'day').toDate());
-    }
-    setCalendar(dates);
-  };
-
-  // const generateSlotsFrontend = () => {
-  //   const employee = bookingState.employee;
-  //   const service = bookingState.service;
-
-  //   if (!employee || !service) return;
-
-  //   setLoading(true);
-  //   setSelectedSlot(null);
-
-  //   const dayName = dayjs(selectedDate).format('dddd').toLowerCase();
-
-  //   // ✅ Find today's schedule from workSchedule
-  //   const schedule = employee.workSchedule?.find(
-  //     (d: any) => d.day.toLowerCase() === dayName
-  //   );
-
-  //   if (!schedule) {
-  //     setSlots([]);
-  //     setLoading(false);
-  //     return;
-  //   }
-
-  //   const [startHour, startMinute] = schedule.startTime
-  //     ? schedule.startTime.split(':').map(Number)
-  //     : [9, 0];
-  //   const [endHour, endMinute] = schedule.endTime
-  //     ? schedule.endTime.split(':').map(Number)
-  //     : [17, 0];
-
-  //   let current = dayjs(selectedDate).hour(startHour).minute(startMinute);
-  //   const end = dayjs(selectedDate).hour(endHour).minute(endMinute);
-  //   const duration = service.duration || 30;
-
-  //   const slotList: TimeSlot[] = [];
-  //   while (
-  //     current.add(duration, 'minute').isBefore(end) ||
-  //     current.add(duration, 'minute').isSame(end)
-  //   ) {
-  //     const next = current.clone().add(duration, 'minute');
-  //     slotList.push({ start: current.toDate(), end: next.toDate() });
-  //     current = next;
-  //   }
-
-  //   setSlots(slotList);
-  //   setLoading(false);
-  // };
-
   const handleContinue = () => {
     if (selectedSlot) {
       setDateTime(selectedDate, selectedSlot);
       navigate('/confirm');
     }
-  };
-
-  const formatDate = (date: Date) => {
-    return isJalali
-      ? dayjs(date).calendar('jalali').locale('fa').format('DDDD MMMM YYYY')
-      : dayjs(date).format('DDDD MMMM YYYY');
-  };
-
-  const formatDayName = (date: Date) => {
-    return isJalali
-      ? dayjs(date).calendar('jalali').locale('fa').format('dddd')
-      : dayjs(date).format('dddd');
   };
 
   const generateSlotsFrontend = async () => {
@@ -129,22 +53,15 @@ const CalendarSlots: React.FC = () => {
     setSelectedSlot(null);
 
     try {
-      // 1️⃣ Fetch booked slots for this date
       const dateStr = dayjs(selectedDate).format('YYYY-MM-DD');
-
-      console.log('Sending to backend:', {
-        employee: employee._id,
-        dateStr,
-      });
       const response = await api.get(
         `/salons/651a6b2f8b7a5a1d223e4c90/employees/${employee._id}/availability`,
         {
           params: { employee: employee._id, date: dateStr },
         }
       );
-      const bookedSlots = response.data; // [{ start, end }]
+      const bookedSlots = response.data;
 
-      // 2️⃣ Generate potential slots
       const dayName = dayjs(selectedDate).format('dddd').toLowerCase();
       const schedule = employee.workSchedule?.find(
         (d: any) => d.day.toLowerCase() === dayName
@@ -175,7 +92,6 @@ const CalendarSlots: React.FC = () => {
         const next = current.clone().add(duration, 'minute');
         const newSlot = { start: current.toDate(), end: next.toDate() };
 
-        // 3️⃣ Check if this slot overlaps with any existing booking
         const isOccupied = bookedSlots.some((b: any) => {
           const bookingStart = dayjs(b.start);
           const bookingEnd = dayjs(b.end);
@@ -196,13 +112,14 @@ const CalendarSlots: React.FC = () => {
   };
 
   return (
-    <div className="max-h-screen pb-20">
-      <div className="bg-[#d6a78f] shadow-sm sticky top-0 z-10">
+    // 1. کانتینر اصلی: ارتفاع ثابت برابر با ویوپورت و جلوگیری از اسکرول کلی صفحه
+    <div className="flex flex-col h-[100dvh] bg-[#d6a78f] overflow-hidden">
+      {/* 2. هدر: ارتفاع محتوا را می‌گیرد و ثابت است (flex-none) */}
+      <div className="flex-none bg-[#d6a78f] shadow-sm z-10 w-full">
         <div className="max-w-4xl mx-auto p-4">
-          <h1 className="text-md  text-white mb-2">
-            لطفا
-            <span className="font-bold">" تاریخ و ساعت "</span>
-            خود را انتخاب کنید.
+          <h1 className="text-md text-white mb-2">
+            لطفا <span className="font-bold">" تاریخ و ساعت "</span> خود را
+            انتخاب کنید.
           </h1>
           <div className="border-t border-[#7f3d45] my-2"></div>
           <div className="text-sm text-[#7f3d45] space-y-1">
@@ -218,82 +135,47 @@ const CalendarSlots: React.FC = () => {
         </div>
       </div>
 
-      <div className="max-w-4xl bg-[#d6a78f] h-screen mx-auto p-4 space-y-6">
+      {/* 3. محتوای وسط: فضای باقی‌مانده را پر می‌کند و فقط خودش اسکرول می‌شود (flex-1 overflow-y-auto) */}
+      <div className="flex-1 overflow-y-auto p-4 space-y-4 w-full max-w-4xl mx-auto scrollbar-hide">
         <div>
           <h2 className="text-lg font-semibold text-white mb-3">
             {t('selectDate')}
           </h2>
-          <div className="overflow-x-auto pb-2">
+          <div className="pb-2">
             <JalaliMonthlyCalendar
               selectedDate={selectedDate}
               onSelectDate={setSelectedDate}
             />
-
-            {/* <div className="mt-4 text-center">
-              تاریخ انتخاب‌شده:
-              {selectedDate
-                .locale('fa')
-                .calendar('jalali')
-                .format('YYYY/MM/DD')}
-            </div> */}
-            {/* <div className="grid grid-cols-4 gap-2  min-w-max">
-              {calendar.map((date, index) => {
-                const isSelected = dayjs(date).isSame(selectedDate, 'day');
-                return (
-                  <button
-                    key={index}
-                    onClick={() => setSelectedDate(date)}
-                    className={`
-                      flex flex-col items-center justify-center w-20 h-24 rounded-lg border-2 transition-all duration-200
-                      ${
-                        isSelected
-                          ? 'border-[#7f3d45] bg-blue-50 text-[#7f3d45]'
-                          : 'border-gray-200 bg-white hover:border-blue-300'
-                      }
-                    `}>
-                    <div className="text-xs mb-1">
-                      {formatDayName(date).substring(0, 9)}
-                    </div>
-                    <div className="text-2xl font-bold">
-                      {convertToPersianNumber(
-                        dayjs(date).calendar('jalali').locale('fa').format('D')
-                      )}
-                    </div>
-                    {dayjs(date).calendar('jalali').locale('fa').format('MMMM')}
-                  </button>
-                );
-              })}
-            </div> */}
           </div>
         </div>
 
-        <div>
+        <div className="pb-4">
           <h2 className="text-lg font-semibold text-white mb-3">
             {t('availableSlots')}
           </h2>
           {loading ? (
             <LoadingSpinner />
           ) : slots.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-16 text-gray-300">
+            <div className="flex flex-col items-center justify-center py-8 text-gray-300">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="h-12 w-12 mb-3 text-gray-400"
-                fill="white"
+                fill="none" // Changed to none for better visibility with stroke
                 viewBox="0 0 24 24"
                 stroke="currentColor"
                 strokeWidth={1.5}>
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  d="M8 7V3m8 4V3m-9 8h10m-9 4h8m-10 4h12a2 2 0 002-2V7a2 2 0 00-2-2h-3V3m-6 2H6a2 2 0 00-2 2v10a2 2 0 002 2z"
+                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" // Using a clock icon instead
                 />
               </svg>
-              <p className="text-sm font-medium text-white">
+              <p className="text-sm font-medium text-white text-center">
                 زمان آزادی برای این روز وجود ندارد
               </p>
             </div>
           ) : (
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-3 gap-3 pb-2">
               {slots.map((slot, index) => (
                 <SlotCard
                   key={index}
@@ -305,19 +187,18 @@ const CalendarSlots: React.FC = () => {
             </div>
           )}
         </div>
-
-        {selectedSlot && (
-          <div className=" top-0 left-0 right-0 h-10 border-gray-200 p-4">
-            <div className="max-w-4xl mx-auto ">
-              <button
-                onClick={handleContinue}
-                className="w-full bg-[#7f3d45] text-white py-2 rounded-lg font-semibold shadow-md hover:bg-[#7a85c2] transition-colors">
-                {t('next')}
-              </button>
-            </div>
-          </div>
-        )}
       </div>
+
+      {/* 4. فوتر (دکمه ادامه): همیشه پایین صفحه می‌چسبد (flex-none) */}
+      {selectedSlot && (
+        <div className="flex-none p-4 bg-[#d6a78f] border-t border-[#7f3d45]/20 w-full max-w-4xl mx-auto z-20">
+          <button
+            onClick={handleContinue}
+            className="w-full bg-[#7f3d45] text-white py-3 rounded-xl font-semibold shadow-lg hover:bg-[#6d323a] active:scale-[0.98] transition-all">
+            {t('next')}
+          </button>
+        </div>
+      )}
     </div>
   );
 };

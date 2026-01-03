@@ -10,6 +10,7 @@ import TeleButton from '../components/TeleButton';
 import { showTelegramAlert } from '../utils/telegram';
 import { useStaggerAnimation } from '../hooks/useAnimations';
 import Marjan from '../assets/img/marjan.png';
+
 const EmployeeSelect: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -70,8 +71,8 @@ const EmployeeSelect: React.FC = () => {
   }
 
   return (
-    <div className="h-screen pb-20 bg-[#d6a78f]">
-      <div className="bg-[#d6a78f] shadow-sm sticky top-0 z-10">
+    <div className="flex flex-col h-[100dvh] bg-[#d6a78f] overflow-hidden">
+      <div className="flex-none bg-[#d6a78f] shadow-sm z-10 w-full">
         <div className="max-w-4xl mx-auto p-4">
           <h1 className="text-base text-gray-100 mb-2">
             لطفا <span className="font-bold">"Nail Artist" </span> خود را انتخاب
@@ -87,7 +88,7 @@ const EmployeeSelect: React.FC = () => {
 
       <div
         ref={containerRef}
-        className="max-w-4xl bg-[#d6a78f] mx-auto p-4 space-y-3">
+        className="flex-1 overflow-y-auto max-w-4xl mx-auto p-4 space-y-3 w-full scrollbar-hide">
         {employees.length === 0 ? (
           <div className="text-center py-12 text-gray-500">
             {t('noResults')}
